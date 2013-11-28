@@ -3,7 +3,7 @@ xenapi-in-the-cloud
 
 Tools to launch a XenAPI managed hypervisor in the cloud
 
-## Start XenServer in the RackSpace cloud
+## Start XenServer in the Rackspace cloud
 
 To launch an instance, first make sure, that you have `nova` installed, and
 that your environment has all the settings. For setting up your environment
