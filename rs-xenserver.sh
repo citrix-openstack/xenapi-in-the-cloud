@@ -9,6 +9,16 @@ WORK_DIR=$(mktemp -d)
 TEMPORARY_PRIVKEY="$WORK_DIR/tempkey.pem"
 TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
 
+if nova keypair-list | grep -q "$TEMPORARY_PRIVKEY_NAME"; then
+    echo "ERROR: A keypair already exists with the name $TEMPORARY_PRIVKEY_NAME"
+    exit 1
+fi
+
+if nova list | grep -q "$VM_NAME"; then
+    echo "ERROR: An instance already exists with the name $VM_NAME"
+    exit 1
+fi
+
 nova keypair-add "$TEMPORARY_PRIVKEY_NAME" > "$TEMPORARY_PRIVKEY"
 chmod 0600 "$TEMPORARY_PRIVKEY"
 
