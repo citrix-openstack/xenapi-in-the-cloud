@@ -18,7 +18,7 @@ In this case, I will use `xspassword`.
 
 With all the parameters, the command should look like this:
 
-   rs-xenserver.sh "xs62" "xspassword" "$(cat ~/.ssh/authorized_keys_)"
+   rs-xenserver.sh "xs62" "xspassword" "$(cat ~/.ssh/authorized_keys)"
 
 Briefly, this script will:
 
