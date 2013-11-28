@@ -1,24 +1,27 @@
 #!/bin/bash
 set -xu
 
-XENSERVER_PASSWORD="$1"
-AUTHORIZED_KEYS="$2"
+VM_NAME="$1"
+XENSERVER_PASSWORD="$2"
+AUTHORIZED_KEYS="$3"
 
-nova keypair-add testkey > testkey.pem
-chmod 0600 testkey.pem
+WORK_DIR=$(mktemp -d)
+TEMPORARY_PRIVKEY="$WORK_DIR/tempkey.pem"
+TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
+
+nova keypair-add "$TEMPORARY_PRIVKEY_NAME" > "$TEMPORARY_PRIVKEY"
+chmod 0600 "$TEMPORARY_PRIVKEY"
 
 nova boot \
 	--image "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)" \
 	--flavor "performance1-8" \
-	testvm --key-name testkey
+	"$VM_NAME" --key-name "$TEMPORARY_PRIVKEY_NAME"
 
-while ! nova list | grep testvm | grep -q ACTIVE; do
+while ! nova list | grep "$VM_NAME" | grep -q ACTIVE; do
 	sleep 5
 done
 
-VM_ID=$(nova list | grep testvm | tr -d " " | cut -d "|" -f 2)
-
-echo "VM id is: $VM_ID"
+VM_ID=$(nova list | grep "$VM_NAME" | tr -d " " | cut -d "|" -f 2)
 
 while true; do
 	VM_IP=$(nova show $VM_ID | grep accessIPv4 | tr -d " " | cut -d "|" -f 3)
@@ -34,7 +37,7 @@ while ! echo "kk" | nc -w 1 $VM_IP 22; do
 	sleep 1
 done
 
-ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i testkey.pem root@$VM_IP bash -s -- << EXECUTE_IT_ON_VM
+ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP bash -s -- << EXECUTE_IT_ON_VM
 set -eux
 apt-get -qy update
 apt-get -qy install wget
