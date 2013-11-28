@@ -19,6 +19,16 @@ if nova list | grep -q "$VM_NAME"; then
     exit 1
 fi
 
+function wait_for_ssh() {
+    local host
+
+    host="$1"
+
+    while ! echo "kk" | nc -w 1 "$host" 22 > /dev/null 2>&1; do
+            sleep 1
+    done
+}
+
 nova keypair-add "$TEMPORARY_PRIVKEY_NAME" > "$TEMPORARY_PRIVKEY"
 chmod 0600 "$TEMPORARY_PRIVKEY"
 
@@ -42,10 +52,7 @@ while true; do
 	fi
 done
 
-# Wait till ssh comes up
-while ! echo "kk" | nc -w 1 $VM_IP 22; do
-	sleep 1
-done
+wait_for_ssh "$VM_IP"
 
 ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP bash -s -- << EXECUTE_IT_ON_VM
 set -eux
@@ -137,9 +144,6 @@ EXECUTE_IT_ON_VM
 
 sleep 30
 
-# Wait till ssh comes up
-while ! echo "kk" | nc -w 1 $VM_IP 22; do
-	sleep 1
-done
+wait_for_ssh "$VM_IP"
 
 echo "XenServer should come up here: $VM_IP"
