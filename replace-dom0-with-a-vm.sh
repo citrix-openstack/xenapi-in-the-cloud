@@ -53,20 +53,21 @@ DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 xenstore-write /local/domain/$DOMID/authorized_keys/user "$(cat tempkey.pub)"
 xenstore-chmod -u /local/domain/$DOMID/authorized_keys/user r$DOMID
 
-function guest_ssh() {
+function run_on_vm() {
     ssh \
         -i tempkey \
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
+        -o BatchMode=yes \
         "user@$VM_IP" "$@"
 }
 
-# Wait until I can log in
-while ! guest_ssh true < /dev/null > /dev/null 2>&1; do
+while ! run_on_vm true < /dev/null > /dev/null 2>&1; do
     echo "waiting for key to be activated"
     sleep 1
 done
 
+# Execute this script to restore original config
 cat > restore.sh << RESTORE
 #!/bin/bash
 set -eux
@@ -81,14 +82,9 @@ set -eux
 
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=192.168.33.1 netmask=255.255.255.0
 vif=\$(xe vif-create vm-uuid=$VM network-uuid=$MGT_NET mac=$MAC device=1)
+xe vm-start uuid=$VM
 SWAP
 chmod +x swap.sh
-
-cat > manual_step.sh << MANUAL_STEP
-#!/bin/bash
-set -eux
-
-cat tempkey.pub | ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no user@$VM_IP tee -a .ssh/authorized_keys
 
 {
 cat << EOF
@@ -99,11 +95,14 @@ iface eth1 inet static
   gateway $GATEWAY
   dns-nameservers $DNS_ADDRESSES
 EOF
-} | ssh -i tempkey -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no user@$VM_IP tee interfaces
+} | run_on_vm "sudo tee -a /etc/network/interfaces"
 
-ssh -i tempkey -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no user@$VM_IP "cat interfaces | sudo tee -a /etc/network/interfaces"
-MANUAL_STEP
+# Remove authorized_keys updater
+echo "" | run_on_vm sudo crontab -
 
-chmod +x manual_step.sh
+# Make sure user can utenticate to new box as well
+cat .ssh/authorized_keys | run_on_vm "cat >> .ssh/authorized_keys"
 
-echo "Please run: ./manual_step.sh"
+run_on_vm "sudo halt -p" < /dev/null || true
+
+echo "Done! Please run: ./swap.sh to perform the swap"
