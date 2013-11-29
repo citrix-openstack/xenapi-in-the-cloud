@@ -7,6 +7,20 @@ fi
 
 VM=$(xe vm-import filename=minvm.xva)
 
+# Rollback Operation for later
+cat > remove_machine.sh << REMOVE_MACHINE
+#!/bin/bash
+set -eux
+VBDS=\$(xe vbd-list vm-uuid=$VM params=vdi-uuid --minimal | sed -e 's/,/ /g')
+
+xe vm-uninstall uuid=$VM force=true
+
+for vdi in \$VBDS; do
+    xe vdi-destroy uuid=\$vdi
+done
+REMOVE_MACHINE
+chmod +x remove_machine.sh
+
 PIF=$(xe pif-list device=eth0 --minimal)
 IP=$(xe pif-param-get param-name=IP uuid=$PIF)
 NETMASK=$(xe pif-param-get param-name=netmask uuid=$PIF)
@@ -52,19 +66,6 @@ while ! guest_ssh true < /dev/null > /dev/null 2>&1; do
     echo "waiting for key to be activated"
     sleep 1
 done
-
-cat > remove_machine.sh << REMOVE_MACHINE
-#!/bin/bash
-set -eux
-VBDS=\$(xe vbd-list vm-uuid=$VM params=vdi-uuid --minimal | sed -e 's/,/ /g')
-
-xe vm-uninstall uuid=$VM force=true
-
-for vdi in \$VBDS; do
-    xe vdi-destroy uuid=\$vdi
-done
-REMOVE_MACHINE
-chmod +x remove_machine.sh
 
 cat > restore.sh << RESTORE
 #!/bin/bash
