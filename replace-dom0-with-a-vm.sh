@@ -80,8 +80,11 @@ cat > swap.sh << SWAP
 #!/bin/bash
 set -eux
 
+sleep 1
+
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=192.168.33.1 netmask=255.255.255.0
 vif=\$(xe vif-create vm-uuid=$VM network-uuid=$MGT_NET mac=$MAC device=1)
+
 xe vm-start uuid=$VM
 SWAP
 chmod +x swap.sh
@@ -105,4 +108,11 @@ cat .ssh/authorized_keys | run_on_vm "cat >> .ssh/authorized_keys"
 
 run_on_vm "sudo halt -p" < /dev/null || true
 
-echo "Done! Please run: ./swap.sh to perform the swap"
+# Wait till VM halts
+while ! xe vm-param-get param-name=power-state uuid=$VM | grep -q "halted"; do
+    sleep 1
+done
+
+nohup ./swap.sh < /dev/null > /dev/null 2>&1 &
+
+echo "Done, the VM should come up in seconds."
