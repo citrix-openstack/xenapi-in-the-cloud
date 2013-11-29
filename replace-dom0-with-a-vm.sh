@@ -33,6 +33,26 @@ rm -f tempkey.pub
 
 ssh-keygen -f tempkey -P ""
 
+DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
+
+# Authenticate myself to the VM
+xenstore-write /local/domain/$DOMID/authorized_keys/user "$(cat tempkey.pub)"
+xenstore-chmod -u /local/domain/$DOMID/authorized_keys/user r$DOMID
+
+function guest_ssh() {
+    ssh \
+        -i tempkey \
+        -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        "user@$VM_IP" "$@"
+}
+
+# Wait until I can log in
+while ! guest_ssh true < /dev/null > /dev/null 2>&1; do
+    echo "waiting for key to be activated"
+    sleep 1
+done
+
 cat > remove_machine.sh << REMOVE_MACHINE
 #!/bin/bash
 set -eux
@@ -60,7 +80,6 @@ set -eux
 
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=192.168.33.1 netmask=255.255.255.0
 vif=\$(xe vif-create vm-uuid=$VM network-uuid=$MGT_NET mac=$MAC device=1)
-xe vif-plug uuid=\$vif
 SWAP
 chmod +x swap.sh
 
