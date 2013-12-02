@@ -29,11 +29,20 @@ DNS_ADDRESSES=$(xe pif-param-get param-name=DNS uuid=$PIF | sed -e "s/,/ /g")
 HOST_INT_NET=$(xe network-list name-label="Host internal management network" --minimal)
 MAC=$(xe pif-param-get param-name=MAC  uuid=$PIF)
 ORIGINAL_MGT_NET=$(xe pif-param-get param-name=network-uuid uuid=$PIF)
+NEW_MGT_NET=$(xe network-create name-label=mgt name-description=mgt)
+NEW_MGT_VLAN=$(xe vlan-create vlan=100 pif-uuid=$PIF network-uuid=$NEW_MGT_NET)
+NEW_PIF=$(xe pif-list VLAN=100 device=eth0 --minimal)
+
+# Configure the new pif
+xe pif-reconfigure-ip IP=192.168.33.2 netmask=255.255.255.0 gateway=192.168.33.1 DNS=192.168.33.1 uuid=$NEW_PIF mode=static
 
 # Wipe all vifs
 for vif in $(xe vif-list vm-uuid=$VM --minimal); do xe vif-destroy uuid=$vif; done
 
 xe vif-create vm-uuid=$VM network-uuid=$HOST_INT_NET device=0
+
+# Add a vif to the new mgt network as well
+xe vif-create vm-uuid=$VM network-uuid=$NEW_MGT_NET device=2
 
 xe vm-start uuid=$VM
 
@@ -73,6 +82,7 @@ cat > restore.sh << RESTORE
 set -eux
 
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=$IP netmask=$NETMASK gateway=$GATEWAY
+xe host-management-reconfigure pif-uuid=$PIF
 RESTORE
 chmod +x restore.sh
 
@@ -83,6 +93,7 @@ set -eux
 sleep 1
 
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=0.0.0.0 netmask=0.0.0.0
+xe host-management-reconfigure pif-uuid=$NEW_PIF
 vif=\$(xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MAC device=1)
 
 xe vm-start uuid=$VM
@@ -97,6 +108,11 @@ iface eth1 inet static
   netmask $NETMASK
   gateway $GATEWAY
   dns-nameservers $DNS_ADDRESSES
+
+auto eth2
+  iface eth2 inet static
+  address 192.168.33.1
+  netmask 255.255.255.0
 EOF
 } | run_on_vm "sudo tee -a /etc/network/interfaces"
 
