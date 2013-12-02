@@ -125,6 +125,19 @@ cat setup-routing.sh | ssh  -q \
     -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
     bash -s --
 
+sleep 5
+
+# Run devstack
+{
+cat << EOF
+XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
+EOF
+cat start-devstack.sh
+} | ssh  -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
+    bash -s --
+
 cat << EOF
 Finished!
 
