@@ -82,7 +82,7 @@ set -eux
 
 sleep 1
 
-xe pif-reconfigure-ip uuid=$PIF mode=static IP=192.168.33.1 netmask=255.255.255.0
+xe pif-reconfigure-ip uuid=$PIF mode=static IP=0.0.0.0 netmask=0.0.0.0
 vif=\$(xe vif-create vm-uuid=$VM network-uuid=$MGT_NET mac=$MAC device=1)
 
 xe vm-start uuid=$VM
