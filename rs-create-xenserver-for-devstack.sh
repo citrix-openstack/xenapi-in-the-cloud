@@ -124,3 +124,11 @@ cat setup-routing.sh | ssh  -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
     bash -s --
+
+cat << EOF
+Finished!
+
+To access your machine, type:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$ACCESS_PRIVKEY" user@$VM_IP
+EOF
