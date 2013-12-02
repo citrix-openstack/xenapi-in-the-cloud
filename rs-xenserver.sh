@@ -63,4 +63,16 @@ sleep 30
 
 wait_for_ssh "$VM_IP"
 
-echo "XenServer should come up here: $VM_IP"
+# Launch a domU and use dom0's IP there
+cat replace-dom0-with-a-vm.sh | ssh  -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null root@$VM_IP \
+    bash -s --
+
+wait_for_ssh "$VM_IP"
+
+# Setup the VM as a router
+cat setup-routing.sh | ssh  -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null user@$VM_IP \
+    bash -s --
