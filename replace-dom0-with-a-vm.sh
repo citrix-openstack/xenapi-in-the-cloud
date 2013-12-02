@@ -28,7 +28,7 @@ GATEWAY=$(xe pif-param-get param-name=gateway uuid=$PIF)
 DNS_ADDRESSES=$(xe pif-param-get param-name=DNS uuid=$PIF | sed -e "s/,/ /g")
 HOST_INT_NET=$(xe network-list name-label="Host internal management network" --minimal)
 MAC=$(xe pif-param-get param-name=MAC  uuid=$PIF)
-MGT_NET=$(xe pif-param-get param-name=network-uuid uuid=$PIF)
+ORIGINAL_MGT_NET=$(xe pif-param-get param-name=network-uuid uuid=$PIF)
 
 # Wipe all vifs
 for vif in $(xe vif-list vm-uuid=$VM --minimal); do xe vif-destroy uuid=$vif; done
@@ -83,7 +83,7 @@ set -eux
 sleep 1
 
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=0.0.0.0 netmask=0.0.0.0
-vif=\$(xe vif-create vm-uuid=$VM network-uuid=$MGT_NET mac=$MAC device=1)
+vif=\$(xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MAC device=1)
 
 xe vm-start uuid=$VM
 SWAP
