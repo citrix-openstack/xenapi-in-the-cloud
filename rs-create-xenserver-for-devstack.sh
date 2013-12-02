@@ -54,7 +54,7 @@ function wait_for_ssh() {
     echo -n "Waiting for port 22 on ${host}"
     while ! echo "kk" | nc -w 1 "$host" 22 > /dev/null 2>&1; do
             sleep 1
-            echo -n"."
+            echo -n "."
     done
     echo "Connectable!"
     set -x
