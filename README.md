@@ -1,9 +1,9 @@
 xenapi-in-the-cloud
 ===================
 
-Tools to launch a XenAPI managed hypervisor in the cloud
+Tools to test a XenAPI managed hypervisor in the cloud
 
-## Start XenServer in the Rackspace cloud
+## Start DevStack on XenServer in the Rackspace cloud
 
 To launch an instance, first make sure, that you have `nova` installed, and
 that your environment has all the settings. For setting up your environment
@@ -14,7 +14,7 @@ In this case, I will use `xspassword`.
 
 With all the parameters, the command should look like this:
 
-    ./rs-create-xenserver-for-devstack.sh "xs62" "xspassword"
+    ./rs-devstack-xenserver.sh "xs62" "xspassword"
 
 Briefly, this script will:
 
@@ -29,3 +29,6 @@ Briefly, this script will:
  - execute [replace-dom0-with-a-vm.sh](replace-dom0-with-a-vm.sh) on Dom0
  - wait 5 secs
  - execute [setup-routing.sh](setup-routing.sh) on DomU
+    - It sets up the domU as a home router (dhcp server, dns proxy)
+ - execute [start-devstack.sh](start-devstack.sh) on DomU
+    - It will download a devstack installer script, and execute it, running smoke tests
