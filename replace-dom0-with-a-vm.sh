@@ -94,7 +94,7 @@ sleep 1
 
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=0.0.0.0 netmask=0.0.0.0
 xe host-management-reconfigure pif-uuid=$NEW_PIF
-vif=\$(xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MAC device=1)
+xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MAC device=1
 
 xe vm-start uuid=$VM
 SWAP
