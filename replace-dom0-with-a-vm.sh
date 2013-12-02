@@ -81,6 +81,9 @@ cat > restore.sh << RESTORE
 #!/bin/bash
 set -eux
 
+sed -ie "s,PasswordAuthentication yes,PasswordAuthentication no,g" /etc/ssh/sshd_config
+/etc/init.d/sshd restart
+
 xe pif-reconfigure-ip uuid=$PIF mode=static IP=$IP netmask=$NETMASK gateway=$GATEWAY
 xe host-management-reconfigure pif-uuid=$PIF
 RESTORE
@@ -97,6 +100,9 @@ xe host-management-reconfigure pif-uuid=$NEW_PIF
 xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MAC device=1
 
 xe vm-start uuid=$VM
+
+sed -ie "s,PasswordAuthentication no,PasswordAuthentication yes,g" /etc/ssh/sshd_config
+/etc/init.d/sshd restart
 SWAP
 chmod +x swap.sh
 
