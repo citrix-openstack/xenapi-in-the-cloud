@@ -14,15 +14,18 @@ In this case, I will use `xspassword`.
 
 With all the parameters, the command should look like this:
 
-    rs-xenserver.sh "xs62" "xspassword"
+    ./rs-create-xenserver-for-devstack.sh "xs62" "xspassword"
 
 Briefly, this script will:
 
  - Generate a keypair to access your final server
  - Create a temporary keypair for OS, launch an ubuntu PVHVM instance
- - SSH to the instance, download xenserver installer
- - Remaster the xenserver installer with an answerfile, ramdisk support
- - Add a grub menu entry - so installer boots next time
- - Reboot the machine - installer kicks off
- - Installer will reboot the machine
- - Script waits until the instance is accessible through ssh, and returns
+ - execute [start-xenserver-installer.sh](start-xenserver-installer.sh) on the Ubuntu VM
+    - Remaster the xenserver installer with an answerfile, ramdisk support
+    - Add a grub menu entry - so installer boots next time
+    - Reboot the machine - installer kicks off
+    - Installer will reboot the machine again - next time, a XenServer's Dom0 will be accessible there.
+ - wait for ssh
+ - execute [replace-dom0-with-a-vm.sh](replace-dom0-with-a-vm.sh) on Dom0
+ - wait 5 secs
+ - execute [setup-routing.sh](setup-routing.sh) on DomU
