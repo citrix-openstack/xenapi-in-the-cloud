@@ -4,6 +4,8 @@ set -xu
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
 
+VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
+
 WORK_DIR=$(mktemp -d)
 TEMPORARY_PRIVKEY="$WORK_DIR/tempkey.pem"
 TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
@@ -16,6 +18,13 @@ if nova keypair-list | grep -q "$TEMPORARY_PRIVKEY_NAME"; then
     exit 1
 fi
 
+cat > "$VM_KILLER_SCRIPT" << EOF
+#!/bin/bash
+
+set -eux
+EOF
+chmod +x "$VM_KILLER_SCRIPT"
+
 # Create a keypair
 if [ -e "$ACCESS_PRIVKEY" ] || [ -e "$ACCESS_PUBKEY" ]; then
     echo "ERROR: A local file exists with the name $ACCESS_PRIVKEY or $ACCESS_PUBKEY"
@@ -25,6 +34,11 @@ else
     [ -e "$ACCESS_PUBKEY" ]
 fi
 AUTHORIZED_KEYS="$(cat $ACCESS_PUBKEY)"
+
+cat >> "$VM_KILLER_SCRIPT" << EOF
+rm -f $ACCESS_PRIVKEY
+rm -f $ACCESS_PUBKEY
+EOF
 
 if nova list | grep -q "$VM_NAME"; then
     echo "ERROR: An instance already exists with the name $VM_NAME"
@@ -44,6 +58,10 @@ function wait_for_ssh() {
 nova keypair-add "$TEMPORARY_PRIVKEY_NAME" > "$TEMPORARY_PRIVKEY"
 chmod 0600 "$TEMPORARY_PRIVKEY"
 
+cat >> "$VM_KILLER_SCRIPT" << EOF
+nova keypair-delete "$TEMPORARY_PRIVKEY_NAME"
+EOF
+
 nova boot \
 	--image "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)" \
 	--flavor "performance1-8" \
@@ -54,6 +72,10 @@ while ! nova list | grep "$VM_NAME" | grep -q ACTIVE; do
 done
 
 VM_ID=$(nova list | grep "$VM_NAME" | tr -d " " | cut -d "|" -f 2)
+
+cat >> "$VM_KILLER_SCRIPT" << EOF
+nova delete "$VM_ID"
+EOF
 
 while true; do
 	VM_IP=$(nova show $VM_ID | grep accessIPv4 | tr -d " " | cut -d "|" -f 3)
