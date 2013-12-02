@@ -66,7 +66,13 @@ done
 
 wait_for_ssh "$VM_IP"
 
-cat start-xenserver-installer.sh | ssh -q \
+{
+cat << EOF
+XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
+AUTHORIZED_KEYS="$AUTHORIZED_KEYS"
+EOF
+cat start-xenserver-installer.sh
+} | ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
     bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
