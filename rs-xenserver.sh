@@ -3,16 +3,28 @@ set -xu
 
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
-AUTHORIZED_KEYS="$3"
 
 WORK_DIR=$(mktemp -d)
 TEMPORARY_PRIVKEY="$WORK_DIR/tempkey.pem"
 TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
 
+ACCESS_PRIVKEY="$VM_NAME.priv"
+ACCESS_PUBKEY="$ACCESS_PRIVKEY.pub"
+
 if nova keypair-list | grep -q "$TEMPORARY_PRIVKEY_NAME"; then
     echo "ERROR: A keypair already exists with the name $TEMPORARY_PRIVKEY_NAME"
     exit 1
 fi
+
+# Create a keypair
+if [ -e "$ACCESS_PRIVKEY" ] || [ -e "$ACCESS_PUBKEY" ]; then
+    echo "ERROR: A local file exists with the name $ACCESS_PRIVKEY or $ACCESS_PUBKEY"
+    exit 1
+else
+    ssh-keygen -t rsa -N "" -f "$ACCESS_PRIVKEY"
+    [ -e "$ACCESS_PUBKEY" ]
+fi
+AUTHORIZED_KEYS="$(cat $ACCESS_PUBKEY)"
 
 if nova list | grep -q "$VM_NAME"; then
     echo "ERROR: An instance already exists with the name $VM_NAME"
@@ -66,7 +78,7 @@ wait_for_ssh "$VM_IP"
 # Launch a domU and use dom0's IP there
 cat replace-dom0-with-a-vm.sh | ssh  -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null root@$VM_IP \
+    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" root@$VM_IP \
     bash -s --
 
 wait_for_ssh "$VM_IP"
@@ -74,5 +86,5 @@ wait_for_ssh "$VM_IP"
 # Setup the VM as a router
 cat setup-routing.sh | ssh  -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null user@$VM_IP \
+    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
     bash -s --
