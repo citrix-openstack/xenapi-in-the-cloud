@@ -114,6 +114,9 @@ cat replace-dom0-with-a-vm.sh | ssh  -q \
     -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" root@$VM_IP \
     bash -s --
 
+# A small delay is needed here...
+sleep 5
+
 wait_for_ssh "$VM_IP"
 
 # Setup the VM as a router
