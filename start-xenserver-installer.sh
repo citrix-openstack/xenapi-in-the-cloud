@@ -14,10 +14,10 @@ NAMESERVER_ELEMENTS=$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 |
 # xsint will be searched
 rm -rf /xsint
 mkdir /xsinst
-cp xs62.iso /xsinst/
+mv xs62.iso /xsinst/
 
 mkdir -p /mnt/xs-iso
-mount -o loop xs62.iso /mnt/xs-iso
+mount -o loop /xsinst/xs62.iso /mnt/xs-iso
 mkdir /opt/xs-install
 
 cp -r /mnt/xs-iso/* /opt/xs-install/

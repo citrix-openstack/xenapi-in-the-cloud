@@ -118,14 +118,6 @@ nova unrescue "$VM_ID"
 
 wait_for_ssh "$VM_IP"
 
-cat << EOF
-To access the shrinked machine:
-
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
-EOF
-
-exit 0
-
 {
 cat << EOF
 XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
