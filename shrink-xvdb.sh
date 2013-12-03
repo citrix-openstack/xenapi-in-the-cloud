@@ -19,4 +19,3 @@ partprobe /dev/xvdb
 tune2fs -j /dev/xvdb1
 
 sync 
-halt -p
