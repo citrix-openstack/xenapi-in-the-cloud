@@ -92,14 +92,43 @@ while true; do
 done
 
 wait_for_ssh "$VM_IP"
-cat << EOF
-Finished!
 
-To access your machine, type:
+ssh -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS" << EOF
+set -eux
+halt -p
+EOF
+
+sleep 5
+
+nova rescue "$VM_ID"
+
+wait_for_ssh "$VM_IP"
+
+cat << EOF
+To access the rescue machine:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
 EOF
 exit 0
+
+# Resize partition
+e2fsck -f /dev/xvdb1
+resize2fs /dev/xvdb1 4G
+NUMBER_OF_BLOCKS=$(tune2fs -l /dev/xvdb1 | grep "Block count" | tr -d " " | cut -d":" -f 2)
+sfdisk -d /dev/xvdb | sed -e "s,[0-9]\{8\},$NUMBER_OF_BLOCKS,g" | sfdisk /dev/xvdb
+partprobe /dev/xvdb
+sync
+halt -p
+
+nova unrescue "$VM_ID"
+
+
+
+
+
 
 {
 cat << EOF
