@@ -34,7 +34,7 @@ zcat "/opt/xs-install/install.img" | cpio -idum --quiet
 cat > answerfile.xml << EOF
 <?xml version="1.0"?>
 <installation srtype="ext">
-<primary-disk>sda</primary-disk>
+<primary-disk preserve-first-partition="true">sda</primary-disk>
 <keymap>us</keymap>
 <root-password>$XENSERVER_PASSWORD</root-password>
 <source type="url">file:///tmp/ramdisk</source>
