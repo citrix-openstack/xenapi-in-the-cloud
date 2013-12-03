@@ -2,7 +2,7 @@ set -eux
 
 fsck -n /dev/xvdb1
 tune2fs -O ^has_journal /dev/xvdb1
-e2fsck -f /dev/xvdb1
+e2fsck -fp /dev/xvdb1
 resize2fs /dev/xvdb1 4G
 
 # Number of 4k blocks
