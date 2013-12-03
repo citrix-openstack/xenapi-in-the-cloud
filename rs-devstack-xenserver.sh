@@ -92,6 +92,14 @@ while true; do
 done
 
 wait_for_ssh "$VM_IP"
+cat << EOF
+Finished!
+
+To access your machine, type:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
+EOF
+exit 0
 
 {
 cat << EOF
