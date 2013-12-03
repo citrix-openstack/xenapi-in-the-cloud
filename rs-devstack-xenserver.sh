@@ -105,6 +105,8 @@ sleep 5
 
 nova rescue "$VM_ID"
 
+sleep 5
+
 wait_for_ssh "$VM_IP"
 
 cat shrink-xvdb.sh | ssh -q \
@@ -115,6 +117,8 @@ cat shrink-xvdb.sh | ssh -q \
 sleep 5
 
 nova unrescue "$VM_ID"
+
+sleep 5
 
 wait_for_ssh "$VM_IP"
 
