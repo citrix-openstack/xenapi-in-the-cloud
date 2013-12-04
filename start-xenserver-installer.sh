@@ -1,6 +1,8 @@
 set -eux
 
 wget -qO xs62.iso http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
+wget -qO staging_vm.xva http://downloads.vmd.citrix.com/OpenStack/minvm.xva
+
 sed -ie 's/^GRUB_HIDDEN_TIMEOUT/#GRUB_HIDDEN_TIMEOUT/g' /etc/default/grub
 sed -ie 's/^GRUB_HIDDEN_TIMEOUT_QUIET/#GRUB_HIDDEN_TIMEOUT_QUIET/g' /etc/default/grub
 # sed -ie 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
@@ -19,6 +21,8 @@ mv xs62.iso /xsinst/
 mkdir -p /mnt/xs-iso
 mount -o loop /xsinst/xs62.iso /mnt/xs-iso
 mkdir /opt/xs-install
+
+mv staging_vm.xva /opt/xs-install/
 
 cp -r /mnt/xs-iso/* /opt/xs-install/
 umount /mnt/xs-iso

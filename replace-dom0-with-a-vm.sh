@@ -1,11 +1,10 @@
 #!/bin/bash
 set -eux
 
-if ! [ -e minvm.xva ]; then
-    wget -qO minvm.xva http://downloads.vmd.citrix.com/OpenStack/minvm.xva
-fi
-
-VM=$(xe vm-import filename=minvm.xva)
+mkdir -p /mnt/ubuntu
+mount /dev/sda1 /mnt/ubuntu
+VM=$(xe vm-import filename=/mnt/ubuntu/opt/xs-install/staging_vm.xva)
+umount /mnt/ubuntu
 
 # Rollback Operation for later
 cat > remove_machine.sh << REMOVE_MACHINE
