@@ -18,4 +18,4 @@ sfdisk -d /dev/xvdb | sed -e "s,[0-9]\{8\},$SIZE_OF_PARTITION,g" | sfdisk /dev/x
 partprobe /dev/xvdb
 tune2fs -j /dev/xvdb1
 
-sync 
+sync
