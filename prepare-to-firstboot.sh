@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eux
+
 cat > /root/generate-firstboot.sh << EOF
 #!/bin/bash
 set -eux

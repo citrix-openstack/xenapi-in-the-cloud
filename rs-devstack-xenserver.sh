@@ -137,10 +137,20 @@ sleep 30
 
 wait_for_ssh "$VM_IP"
 
+{
+cat prepare-to-firstboot.sh
+echo "reboot"
+} | ssh -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
+
+wait_for_ssh "$VM_IP"
+
 cat << EOF
 development breakpoint.
 
-To access the ubuntu machine, type:
+To access XenServer:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
 EOF
