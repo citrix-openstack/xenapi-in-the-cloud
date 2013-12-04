@@ -17,6 +17,11 @@ NAMESERVERS=\$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 | sort |
 cat << ON_XS
 #!/bin/bash
 set -eux
+
+while ! xe host-list --minimal; do
+    sleep 1
+done
+
 xe pif-introduce device=eth0 host-uuid=\\\$(xe host-list --minimal) mac=\$MACADDRESS
 xe pif-reconfigure-ip uuid=\\\$(xe pif-list device=eth0 --minimal) mode=static IP=\$ADDRESS netmask=\$NETMASK gateway=\$GATEWAY DNS=\$NAMESERVERS
 xe host-management-reconfigure pif-uuid=\\\$(xe pif-list device=eth0 --minimal)
