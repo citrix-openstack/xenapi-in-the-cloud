@@ -64,6 +64,42 @@ EOF
 
 cat > firstboot.sh << EOF
 #!/bin/bash
+
+mkdir -p /mnt/ubuntu
+mount /dev/sda1 /mnt/ubuntu
+
+KERNEL=\$(ls -1c /mnt/ubuntu/boot/vmlinuz-* | head -1)
+INITRD=\$(ls -1c /mnt/ubuntu/boot/initrd.img-* | head -1)
+
+cp \$KERNEL /boot/vmlinuz-ubuntu
+cp \$INITRD /boot/initrd-ubuntu
+
+umount /mnt/ubuntu
+
+cat >> /boot/extlinux.conf << UBUNTU
+label ubuntu
+    LINUX /boot/vmlinuz-ubuntu
+    APPEND root=/dev/xvda1 ro quiet splash
+    INITRD /boot/initrd-ubuntu
+UBUNTU
+
+# Boot Ubuntu next time
+sed -ie's,default xe-serial,default ubuntu,g' /boot/extlinux.conf
+
+# Import staging VM
+xe vm-import filename=/mnt/ubuntu/opt/xs-install/staging_vm.xva
+
+xe host-management-disable
+IFS=,
+for pif in \$(xe pif-list --minimal); do
+    xe pif-forget uuid=\$pif
+done
+unset IFS
+
+HOST=\$(xe host-list --minimal)
+xe host-disable host=\$HOST
+
+reboot
 EOF
 
 find . -print | cpio -o --quiet -H newc | xz --format=lzma > /opt/xs-install/install_modded.img
