@@ -45,7 +45,8 @@
       <w>130</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>Ubuntu running</panel_attributes>
+    <panel_attributes>Ubuntu running
+bg=#DD4814</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -91,7 +92,8 @@ halt</panel_attributes>
       <w>130</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>Rescue running</panel_attributes>
+    <panel_attributes>Rescue running
+bg=#DD4814</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -137,7 +139,8 @@ shrink_xvdb.sh</panel_attributes>
       <w>170</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>Ubuntu running</panel_attributes>
+    <panel_attributes>Ubuntu running
+bg=#DD4814</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -160,7 +163,8 @@ nova unrescue</panel_attributes>
       <w>210</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>XenServer installer running</panel_attributes>
+    <panel_attributes>XenServer installer running
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -183,7 +187,9 @@ start_xenserver_installer.sh</panel_attributes>
       <w>290</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>XenServer running</panel_attributes>
+    <panel_attributes>XenServer running
+accessible through public IP
+bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -204,10 +210,12 @@ wait_for_ssh</panel_attributes>
       <x>650</x>
       <y>550</y>
       <w>290</w>
-      <h>40</h>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Staging VM is accessible
-through public IP</panel_attributes>
+through public IP
+XenServer on 192.168.33.2
+bg=#DD4814</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -226,19 +234,20 @@ replace-dom0-with-a-vm.sh</panel_attributes>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>650</x>
-      <y>660</y>
+      <y>680</y>
       <w>290</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>Staging routing with shorewall
-and dnsmasq</panel_attributes>
+    <panel_attributes>Staging VM is routing with shorewall
+and dnsmasq, providing DHCP
+bg=#DD4814</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>710</x>
-      <y>560</y>
+      <y>580</y>
       <w>172</w>
       <h>120</h>
     </coordinates>
@@ -250,7 +259,7 @@ setup-routing.sh</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>710</x>
-      <y>670</y>
+      <y>690</y>
       <w>178</w>
       <h>120</h>
     </coordinates>
@@ -262,11 +271,12 @@ start-devstack.sh</panel_attributes>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>650</x>
-      <y>770</y>
+      <y>790</y>
       <w>290</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>DevStack running</panel_attributes>
+    <panel_attributes>DevStack running
+bg=#DD4814</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
