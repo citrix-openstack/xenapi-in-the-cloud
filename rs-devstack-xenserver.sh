@@ -93,6 +93,35 @@ done
 
 wait_for_ssh "$VM_IP"
 
+ssh -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS" << EOF
+set -eux
+halt -p
+EOF
+
+sleep 5
+
+nova rescue "$VM_ID"
+
+sleep 5
+
+wait_for_ssh "$VM_IP"
+
+cat shrink-xvdb.sh | ssh -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
+
+sleep 5
+
+nova unrescue "$VM_ID"
+
+sleep 5
+
+wait_for_ssh "$VM_IP"
+
 {
 cat << EOF
 XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
