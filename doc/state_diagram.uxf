@@ -159,7 +159,7 @@ nova unrescue</panel_attributes>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>320</x>
-      <y>440</y>
+      <y>480</y>
       <w>210</w>
       <h>40</h>
     </coordinates>
@@ -173,17 +173,17 @@ nova unrescue</panel_attributes>
       <x>290</x>
       <y>340</y>
       <w>250</w>
-      <h>120</h>
+      <h>160</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 start_xenserver_installer.sh</panel_attributes>
-    <additional_attributes>130;100;130;30</additional_attributes>
+    <additional_attributes>130;140;130;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>650</x>
-      <y>440</y>
+      <y>480</y>
       <w>290</w>
       <h>40</h>
     </coordinates>
@@ -196,7 +196,7 @@ bg=blue</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>500</x>
-      <y>410</y>
+      <y>450</y>
       <w>170</w>
       <h>70</h>
     </coordinates>
@@ -208,7 +208,7 @@ wait_for_ssh</panel_attributes>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>650</x>
-      <y>550</y>
+      <y>590</y>
       <w>290</w>
       <h>60</h>
     </coordinates>
@@ -222,7 +222,7 @@ bg=#DD4814</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>670</x>
-      <y>450</y>
+      <y>490</y>
       <w>250</w>
       <h>120</h>
     </coordinates>
@@ -234,7 +234,7 @@ replace-dom0-with-a-vm.sh</panel_attributes>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>650</x>
-      <y>680</y>
+      <y>720</y>
       <w>290</w>
       <h>40</h>
     </coordinates>
@@ -247,7 +247,7 @@ bg=#DD4814</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>710</x>
-      <y>580</y>
+      <y>620</y>
       <w>172</w>
       <h>120</h>
     </coordinates>
@@ -259,7 +259,7 @@ setup-routing.sh</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>710</x>
-      <y>690</y>
+      <y>730</y>
       <w>178</w>
       <h>120</h>
     </coordinates>
@@ -271,12 +271,37 @@ start-devstack.sh</panel_attributes>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
       <x>650</x>
-      <y>790</y>
+      <y>830</y>
       <w>290</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>DevStack running
 bg=#DD4814</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Note</type>
+    <coordinates>
+      <x>550</x>
+      <y>380</y>
+      <w>380</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>All external dependencies are downloaded here:
+- XenServer install CD
+- Staging VM
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>420</x>
+      <y>360</y>
+      <w>150</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>30;50;130;30</additional_attributes>
   </element>
 </diagram>
