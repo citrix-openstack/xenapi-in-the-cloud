@@ -137,6 +137,16 @@ sleep 30
 
 wait_for_ssh "$VM_IP"
 
+cat << EOF
+development breakpoint.
+
+To access the ubuntu machine, type:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
+EOF
+
+exit 0
+
 # Launch a domU and use dom0's IP there
 cat replace-dom0-with-a-vm.sh | ssh  -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
