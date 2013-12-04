@@ -4,9 +4,6 @@ set -eux
 
 XENSERVER="192.168.33.2"
 
-sudo apt-get -qy update
-sudo apt-get -qy install wget sshpass
-
 wget -qO devstack-installer.sh http://downloads.vmd.citrix.com/OpenStack/jenkins-xva-build-external-326.sh
 
 ssh-keygen -t rsa -N "" -f devstack_key.priv

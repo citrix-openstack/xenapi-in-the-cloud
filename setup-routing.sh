@@ -3,15 +3,6 @@ set -eux
 
 export DEBIAN_FRONTEND=noninteractive
 
-sudo tee /etc/apt/sources.list << EOF
-deb http://archive.ubuntu.com/ubuntu precise main
-deb http://archive.ubuntu.com/ubuntu precise universe
-EOF
-
-sudo apt-get -qy update
-sudo apt-get -qy upgrade
-sudo apt-get -qy install shorewall
-
 sudo tee /etc/shorewall/interfaces << EOF
 net      eth1           detect          dhcp,tcpflags,nosmurfs
 lan      eth2           detect          dhcp
@@ -48,8 +39,6 @@ sudo sed -i /etc/shorewall/shorewall.conf \
 # Enable shorewall on startup
 sudo sed -i /etc/default/shorewall \
     -e 's/startup=.*/startup=1/g'
-
-sudo RUNLEVEL=1 apt-get install -qy dnsmasq
 
 # Configure dnsmasq
 sudo tee -a /etc/dnsmasq.conf << EOF
