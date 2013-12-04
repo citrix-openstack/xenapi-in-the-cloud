@@ -8,10 +8,6 @@ sed -ie 's/^GRUB_HIDDEN_TIMEOUT_QUIET/#GRUB_HIDDEN_TIMEOUT_QUIET/g' /etc/default
 # sed -ie 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
 sed -ie 's/^.*GRUB_TERMINAL=.*$/GRUB_TERMINAL=console/g' /etc/default/grub
 
-ADDRESS=$(grep -m 1 "address" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
-NETMASK=$(grep -m 1 "netmask" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
-GATEWAY=$(grep -m 1 "gateway" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
-NAMESERVER_ELEMENTS=$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 | sort | uniq | sed -e 's,^,<nameserver>,g' -e 's,$,</nameserver>,g')
 
 # xsint will be searched
 rm -rf /xsint
@@ -43,11 +39,10 @@ cat > answerfile.xml << EOF
 <root-password>$XENSERVER_PASSWORD</root-password>
 <source type="url">file:///tmp/ramdisk</source>
 <admin-interface name="eth0" proto="static">
-<ip>$ADDRESS</ip>
-<subnet-mask>$NETMASK</subnet-mask>
-<gateway>$GATEWAY</gateway>
+<ip>192.168.34.2</ip>
+<subnet-mask>255.255.255.0</subnet-mask>
+<gateway>192.168.34.1</gateway>
 </admin-interface>
-$NAMESERVER_ELEMENTS
 <timezone>America/Los_Angeles</timezone>
 <script stage="filesystem-populated" type="url">file:///postinst.sh</script>
 </installation>
