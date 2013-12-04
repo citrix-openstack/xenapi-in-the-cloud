@@ -188,7 +188,7 @@ start_xenserver_installer.sh</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>XenServer running
-accessible through public IP
+
 bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
@@ -196,13 +196,13 @@ bg=blue</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>500</x>
-      <y>450</y>
+      <y>470</y>
       <w>170</w>
-      <h>70</h>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-wait_for_ssh</panel_attributes>
-    <additional_attributes>150;50;30;50</additional_attributes>
+</panel_attributes>
+    <additional_attributes>150;30;30;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
@@ -325,7 +325,7 @@ bg=yellow</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>XenServer detached
-it has no network connections
+
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -402,13 +402,13 @@ bg=yellow</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>380</x>
+      <x>330</x>
       <y>600</y>
-      <w>50</w>
+      <w>144</w>
       <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-</panel_attributes>
-    <additional_attributes>30;80;30;30</additional_attributes>
+wait_for_ssh</panel_attributes>
+    <additional_attributes>80;80;80;30</additional_attributes>
   </element>
 </diagram>
