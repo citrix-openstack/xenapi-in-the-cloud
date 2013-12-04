@@ -139,6 +139,7 @@ wait_for_ssh "$VM_IP"
 
 {
 cat prepare-to-firstboot.sh
+echo "touch /root/boot-to-xenserver"
 echo "reboot"
 } | ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
