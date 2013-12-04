@@ -79,7 +79,7 @@ label ubuntu
 UBUNTU
 
 # Boot Ubuntu next time
-sed -ie's,default xe-serial,default ubuntu,g' /boot/extlinux.conf
+sed -ie 's,default xe-serial,default ubuntu,g' /boot/extlinux.conf
 
 # Import staging VM
 xe vm-import filename=/mnt/ubuntu/opt/xs-install/staging_vm.xva
