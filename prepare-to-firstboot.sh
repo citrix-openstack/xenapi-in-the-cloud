@@ -31,13 +31,16 @@ start on stopped rc RUNLEVEL=[2345]
 task
 
 script
-    mkdir -p /mnt/xenserver/
-    mount /dev/xvda2 /mnt/xenserver/
-    /root/generate-firstboot.sh > /mnt/xenserver/etc/firstboot.d/96-cloud
-    chmod 777 /mnt/xenserver/etc/firstboot.d/96-cloud
-    sed -ie 's,default ubuntu,default xe-serial,g' /mnt/xenserver/boot/extlinux.conf
-    cat /root/.ssh/authorized_keys > /mnt/xenserver/root/.ssh/authorized_keys
-    umount /mnt/xenserver
-    reboot
+    if [ -e /root/boot-to-xenserver ]; then
+        rm -f /root/boot-to-xenserver
+        mkdir -p /mnt/xenserver/
+        mount /dev/xvda2 /mnt/xenserver/
+        /root/generate-firstboot.sh > /mnt/xenserver/etc/firstboot.d/96-cloud
+        chmod 777 /mnt/xenserver/etc/firstboot.d/96-cloud
+        sed -ie 's,default ubuntu,default xe-serial,g' /mnt/xenserver/boot/extlinux.conf
+        cat /root/.ssh/authorized_keys > /mnt/xenserver/root/.ssh/authorized_keys
+        umount /mnt/xenserver
+        reboot
+    fi
 end script
 EOF
