@@ -69,8 +69,6 @@ INITRD=\$(ls -1c /mnt/ubuntu/boot/initrd.img-* | head -1)
 cp \$KERNEL /boot/vmlinuz-ubuntu
 cp \$INITRD /boot/initrd-ubuntu
 
-umount /mnt/ubuntu
-
 cat >> /boot/extlinux.conf << UBUNTU
 label ubuntu
     LINUX /boot/vmlinuz-ubuntu
@@ -83,6 +81,8 @@ sed -ie 's,default xe-serial,default ubuntu,g' /boot/extlinux.conf
 
 # Import staging VM
 xe vm-import filename=/mnt/ubuntu/opt/xs-install/staging_vm.xva
+
+umount /mnt/ubuntu
 
 xe host-management-disable
 IFS=,
