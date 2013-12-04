@@ -3,6 +3,8 @@ xenapi-in-the-cloud
 
 Tools to test a XenAPI managed hypervisor in the cloud
 
+![state diagram](doc/state_diagram.png)
+
 ## Start DevStack on XenServer in the Rackspace cloud
 
 To launch an instance, first make sure, that you have `nova` installed, and
