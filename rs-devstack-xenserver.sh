@@ -158,6 +158,8 @@ echo "reboot" | ssh -q \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
     bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
 
+sleep 10
+
 wait_for_ssh "$VM_IP"
 
 cat << EOF
