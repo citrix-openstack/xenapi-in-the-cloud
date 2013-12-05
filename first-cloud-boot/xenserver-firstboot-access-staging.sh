@@ -14,6 +14,7 @@ HOST_INT_NET=$(xe network-list name-label="Host internal management network" --m
 
 ORIGINAL_MGT_NET=$(xe pif-param-get param-name=network-uuid uuid=$PIF)
 NEW_MGT_NET=$(xe network-create name-label=mgt name-description=mgt)
+sleep 1
 NEW_MGT_VLAN=$(xe vlan-create vlan=100 pif-uuid=$PIF network-uuid=$NEW_MGT_NET)
 NEW_PIF=$(xe pif-list VLAN=100 device=eth0 --minimal)
 VM=$(xe vm-list name-label="Staging VM" --minimal)
