@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xu
+set -exu
 
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
@@ -136,6 +136,48 @@ cat start-xenserver-installer.sh
 sleep 30
 
 wait_for_ssh "$VM_IP"
+
+function copy_to_ubuntu() {
+    local src
+    local tgt
+
+    src="$1"
+    tgt="$2"
+
+scp \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" \
+    "$src" "root@$VM_IP:$tgt"
+}
+
+copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
+copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenserver.sh
+
+# You should take a snapshot at this point
+
+
+ssh -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS" << EOF
+set -eux
+touch /root/xenserver-run.request
+reboot
+EOF
+
+sleep 10
+
+wait_for_ssh "$VM_IP"
+
+cat << EOF
+development breakpoint.
+
+To access XenServer:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
+EOF
+
+exit 0
 
 # Launch a domU and use dom0's IP there
 cat replace-dom0-with-a-vm.sh | ssh  -q \

@@ -29,8 +29,8 @@
   <element>
     <type>com.umlet.element.custom.InitialState</type>
     <coordinates>
-      <x>380</x>
-      <y>150</y>
+      <x>340</x>
+      <y>140</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -40,8 +40,8 @@
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>320</x>
-      <y>220</y>
+      <x>400</x>
+      <y>130</y>
       <w>130</w>
       <h>40</h>
     </coordinates>
@@ -52,20 +52,20 @@ bg=#DD4814</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>360</x>
-      <y>140</y>
-      <w>50</w>
-      <h>100</h>
+      <x>330</x>
+      <y>120</y>
+      <w>90</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 </panel_attributes>
-    <additional_attributes>30;80;30;30</additional_attributes>
+    <additional_attributes>70;30;30;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>520</x>
-      <y>220</y>
+      <x>590</x>
+      <y>130</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -75,20 +75,20 @@ bg=#DD4814</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>420</x>
-      <y>190</y>
-      <w>120</w>
+      <x>500</x>
+      <y>100</y>
+      <w>110</w>
       <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 halt</panel_attributes>
-    <additional_attributes>100;50;30;50</additional_attributes>
+    <additional_attributes>90;50;30;50</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>810</x>
-      <y>220</y>
+      <x>830</x>
+      <y>130</y>
       <w>130</w>
       <h>40</h>
     </coordinates>
@@ -99,20 +99,20 @@ bg=#DD4814</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>610</x>
-      <y>190</y>
-      <w>220</w>
+      <x>680</x>
+      <y>100</y>
+      <w>170</w>
       <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 nova rescue</panel_attributes>
-    <additional_attributes>200;50;30;50</additional_attributes>
+    <additional_attributes>150;50;30;50</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>790</x>
-      <y>230</y>
+      <x>810</x>
+      <y>140</y>
       <w>162</w>
       <h>120</h>
     </coordinates>
@@ -123,8 +123,8 @@ shrink_xvdb.sh</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>760</x>
-      <y>330</y>
+      <x>780</x>
+      <y>240</y>
       <w>180</w>
       <h>40</h>
     </coordinates>
@@ -134,8 +134,8 @@ shrink_xvdb.sh</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>320</x>
-      <y>330</y>
+      <x>340</x>
+      <y>240</y>
       <w>170</w>
       <h>40</h>
     </coordinates>
@@ -146,8 +146,8 @@ bg=#DD4814</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>460</x>
-      <y>300</y>
+      <x>480</x>
+      <y>210</y>
       <w>320</w>
       <h>70</h>
     </coordinates>
@@ -158,8 +158,8 @@ nova unrescue</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>320</x>
-      <y>480</y>
+      <x>340</x>
+      <y>390</y>
       <w>210</w>
       <h>40</h>
     </coordinates>
@@ -170,8 +170,8 @@ nova unrescue</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>290</x>
-      <y>340</y>
+      <x>310</x>
+      <y>250</y>
       <w>250</w>
       <h>160</h>
     </coordinates>
@@ -182,108 +182,31 @@ start_xenserver_installer.sh</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>650</x>
-      <y>480</y>
-      <w>290</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>XenServer running
-accessible through public IP
-bg=blue</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>500</x>
-      <y>450</y>
-      <w>170</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-wait_for_ssh</panel_attributes>
-    <additional_attributes>150;50;30;50</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.State</type>
-    <coordinates>
-      <x>650</x>
-      <y>590</y>
-      <w>290</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>Staging VM is accessible
-through public IP
-XenServer on 192.168.33.2
-bg=#DD4814</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
       <x>670</x>
-      <y>490</y>
-      <w>250</w>
-      <h>120</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-replace-dom0-with-a-vm.sh</panel_attributes>
-    <additional_attributes>130;100;130;30</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.State</type>
-    <coordinates>
-      <x>650</x>
-      <y>720</y>
+      <y>390</y>
       <w>290</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>Staging VM is routing with shorewall
-and dnsmasq, providing DHCP
-bg=#DD4814</panel_attributes>
+    <panel_attributes>XenServer running</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>710</x>
-      <y>620</y>
-      <w>172</w>
-      <h>120</h>
+      <x>520</x>
+      <y>380</y>
+      <w>170</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-setup-routing.sh</panel_attributes>
-    <additional_attributes>90;100;90;30</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>710</x>
-      <y>730</y>
-      <w>178</w>
-      <h>120</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-start-devstack.sh</panel_attributes>
-    <additional_attributes>90;100;90;30</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.State</type>
-    <coordinates>
-      <x>650</x>
-      <y>830</y>
-      <w>290</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>DevStack running
-bg=#DD4814</panel_attributes>
-    <additional_attributes/>
+</panel_attributes>
+    <additional_attributes>150;30;30;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Note</type>
     <coordinates>
-      <x>550</x>
-      <y>380</y>
+      <x>570</x>
+      <y>290</y>
       <w>380</w>
       <h>60</h>
     </coordinates>
@@ -296,12 +219,399 @@ bg=yellow</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>420</x>
-      <y>360</y>
+      <x>440</x>
+      <y>270</y>
       <w>150</w>
       <h>70</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>30;50;130;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>890</x>
+      <y>400</y>
+      <w>50</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>30;100;30;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>670</x>
+      <y>500</y>
+      <w>290</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>XenServer detached
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>340</x>
+      <y>500</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Ubuntu started
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>480</x>
+      <y>470</y>
+      <w>210</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+reboot</panel_attributes>
+    <additional_attributes>30;50;190;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Note</type>
+    <coordinates>
+      <x>640</x>
+      <y>440</y>
+      <w>230</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>These steps are performed
+by firstboot script 95-firstboot
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>840</x>
+      <y>430</y>
+      <w>90</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>30;30;70;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>580</x>
+      <y>430</y>
+      <w>80</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>60;30;30;30;30;70</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>350</x>
+      <y>510</y>
+      <w>144</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+wait_for_ssh</panel_attributes>
+    <additional_attributes>80;80;80;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>340</x>
+      <y>590</y>
+      <w>130</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Ubuntu running
+bg=#DD4814
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>600</x>
+      <y>590</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Ubuntu running
+bg=#DD4814
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>440</x>
+      <y>560</y>
+      <w>180</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+copy upstart</panel_attributes>
+    <additional_attributes>160;50;30;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>830</x>
+      <y>650</y>
+      <w>130</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Ubuntu running
+bg=#DD4814
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>740</x>
+      <y>560</y>
+      <w>242</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+copy boot-to-xenserver.sh
+</panel_attributes>
+    <additional_attributes>130;90;130;50;30;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>420</x>
+      <y>740</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Ubuntu started
+bg=#DD4814</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>390</x>
+      <y>660</y>
+      <w>104</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+reboot</panel_attributes>
+    <additional_attributes>60;70;60;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>770</x>
+      <y>740</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>upstart started
+bg=#DD4814
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>560</x>
+      <y>710</y>
+      <w>230</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+upstart executed</panel_attributes>
+    <additional_attributes>210;50;30;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>770</x>
+      <y>890</y>
+      <w>190</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>booting to XenServer
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>340</x>
+      <y>960</y>
+      <w>290</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>XenServer running in the cloud
+
+bg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>840</x>
+      <y>900</y>
+      <w>50</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>30;60;30;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>750</x>
+      <y>960</y>
+      <w>210</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>96-cloud firstboot running
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>600</x>
+      <y>950</y>
+      <w>170</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>30;30;150;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>340</x>
+      <y>730</y>
+      <w>620</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.InitialState</type>
+    <coordinates>
+      <x>350</x>
+      <y>750</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>340</x>
+      <y>730</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>80;30;30;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>540</x>
+      <y>810</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>upstart started
+bg=#DD4814
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>680</x>
+      <y>750</y>
+      <w>292</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+boot-to-xenserver.sh executed</panel_attributes>
+    <additional_attributes>30;80;160;80;160;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.FinalState</type>
+    <coordinates>
+      <x>350</x>
+      <y>820</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>340</x>
+      <y>780</y>
+      <w>220</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+reboot</panel_attributes>
+    <additional_attributes>30;50;200;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>840</x>
+      <y>830</y>
+      <w>50</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>30;60;30;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>340</x>
+      <y>650</y>
+      <w>210</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>xenserver upstart enabled
+bg=#DD4814
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>520</x>
+      <y>620</y>
+      <w>330</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+touch /root/xenserver-run.request
+</panel_attributes>
+    <additional_attributes>30;50;310;50</additional_attributes>
   </element>
 </diagram>

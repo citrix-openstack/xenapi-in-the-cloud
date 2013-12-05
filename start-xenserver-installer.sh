@@ -8,10 +8,6 @@ sed -ie 's/^GRUB_HIDDEN_TIMEOUT_QUIET/#GRUB_HIDDEN_TIMEOUT_QUIET/g' /etc/default
 # sed -ie 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
 sed -ie 's/^.*GRUB_TERMINAL=.*$/GRUB_TERMINAL=console/g' /etc/default/grub
 
-ADDRESS=$(grep -m 1 "address" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
-NETMASK=$(grep -m 1 "netmask" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
-GATEWAY=$(grep -m 1 "gateway" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
-NAMESERVER_ELEMENTS=$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 | sort | uniq | sed -e 's,^,<nameserver>,g' -e 's,$,</nameserver>,g')
 
 # xsint will be searched
 rm -rf /xsint
@@ -43,11 +39,10 @@ cat > answerfile.xml << EOF
 <root-password>$XENSERVER_PASSWORD</root-password>
 <source type="url">file:///tmp/ramdisk</source>
 <admin-interface name="eth0" proto="static">
-<ip>$ADDRESS</ip>
-<subnet-mask>$NETMASK</subnet-mask>
-<gateway>$GATEWAY</gateway>
+<ip>192.168.34.2</ip>
+<subnet-mask>255.255.255.0</subnet-mask>
+<gateway>192.168.34.1</gateway>
 </admin-interface>
-$NAMESERVER_ELEMENTS
 <timezone>America/Los_Angeles</timezone>
 <script stage="filesystem-populated" type="url">file:///postinst.sh</script>
 </installation>
@@ -64,6 +59,42 @@ EOF
 
 cat > firstboot.sh << EOF
 #!/bin/bash
+
+mkdir -p /mnt/ubuntu
+mount /dev/sda1 /mnt/ubuntu
+
+KERNEL=\$(ls -1c /mnt/ubuntu/boot/vmlinuz-* | head -1)
+INITRD=\$(ls -1c /mnt/ubuntu/boot/initrd.img-* | head -1)
+
+cp \$KERNEL /boot/vmlinuz-ubuntu
+cp \$INITRD /boot/initrd-ubuntu
+
+cat >> /boot/extlinux.conf << UBUNTU
+label ubuntu
+    LINUX /boot/vmlinuz-ubuntu
+    APPEND root=/dev/xvda1 ro quiet splash
+    INITRD /boot/initrd-ubuntu
+UBUNTU
+
+# Boot Ubuntu next time
+sed -ie 's,default xe-serial,default ubuntu,g' /boot/extlinux.conf
+
+# Import staging VM
+xe vm-import filename=/mnt/ubuntu/opt/xs-install/staging_vm.xva
+
+umount /mnt/ubuntu
+
+xe host-management-disable
+IFS=,
+for pif in \$(xe pif-list --minimal); do
+    xe pif-forget uuid=\$pif
+done
+unset IFS
+
+HOST=\$(xe host-list --minimal)
+xe host-disable host=\$HOST
+
+reboot
 EOF
 
 find . -print | cpio -o --quiet -H newc | xz --format=lzma > /opt/xs-install/install_modded.img
