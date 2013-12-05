@@ -6,12 +6,8 @@ XENSERVER_PASSWORD="$2"
 
 VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
 
-WORK_DIR=$(mktemp -d)
-TEMPORARY_PRIVKEY="$WORK_DIR/tempkey.pem"
+TEMPORARY_PRIVKEY="$VM_NAME.pem"
 TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
-
-ACCESS_PRIVKEY="$VM_NAME.priv"
-ACCESS_PUBKEY="$ACCESS_PRIVKEY.pub"
 
 if nova keypair-list | grep -q "$TEMPORARY_PRIVKEY_NAME"; then
     echo "ERROR: A keypair already exists with the name $TEMPORARY_PRIVKEY_NAME"
@@ -24,21 +20,6 @@ cat > "$VM_KILLER_SCRIPT" << EOF
 set -eux
 EOF
 chmod +x "$VM_KILLER_SCRIPT"
-
-# Create a keypair
-if [ -e "$ACCESS_PRIVKEY" ] || [ -e "$ACCESS_PUBKEY" ]; then
-    echo "ERROR: A local file exists with the name $ACCESS_PRIVKEY or $ACCESS_PUBKEY"
-    exit 1
-else
-    ssh-keygen -t rsa -N "" -f "$ACCESS_PRIVKEY"
-    [ -e "$ACCESS_PUBKEY" ]
-fi
-AUTHORIZED_KEYS="$(cat $ACCESS_PUBKEY)"
-
-cat >> "$VM_KILLER_SCRIPT" << EOF
-rm -f $ACCESS_PRIVKEY
-rm -f $ACCESS_PUBKEY
-EOF
 
 if nova list | grep -q "$VM_NAME"; then
     echo "ERROR: An instance already exists with the name $VM_NAME"
@@ -65,6 +46,7 @@ chmod 0600 "$TEMPORARY_PRIVKEY"
 
 cat >> "$VM_KILLER_SCRIPT" << EOF
 nova keypair-delete "$TEMPORARY_PRIVKEY_NAME"
+rm -f "$TEMPORARY_PRIVKEY"
 EOF
 
 nova boot \
@@ -96,7 +78,7 @@ wait_for_ssh "$VM_IP"
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS" << EOF
+    bash -s -- << EOF
 set -eux
 halt -p
 EOF
@@ -112,7 +94,7 @@ wait_for_ssh "$VM_IP"
 cat shrink-xvdb.sh | ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
+    bash -s --
 
 sleep 5
 
@@ -125,13 +107,12 @@ wait_for_ssh "$VM_IP"
 {
 cat << EOF
 XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
-AUTHORIZED_KEYS="$AUTHORIZED_KEYS"
 EOF
 cat start-xenserver-installer.sh
 } | ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
+    bash -s --
 
 sleep 30
 
@@ -159,7 +140,7 @@ copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenser
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS" << EOF
+    bash -s -- << EOF
 set -eux
 touch /root/xenserver-run.request
 reboot
@@ -170,49 +151,9 @@ sleep 10
 wait_for_ssh "$VM_IP"
 
 cat << EOF
-development breakpoint.
+Finished.
 
 To access XenServer:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
-EOF
-
-exit 0
-
-# Launch a domU and use dom0's IP there
-cat replace-dom0-with-a-vm.sh | ssh  -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" root@$VM_IP \
-    bash -s --
-
-# A small delay is needed here...
-sleep 5
-
-wait_for_ssh "$VM_IP"
-
-# Setup the VM as a router
-cat setup-routing.sh | ssh  -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
-    bash -s --
-
-sleep 5
-
-# Run devstack
-{
-cat << EOF
-XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
-EOF
-cat start-devstack.sh
-} | ssh  -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
-    bash -s --
-
-cat << EOF
-Finished!
-
-To access your machine, type:
-
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$ACCESS_PRIVKEY" user@$VM_IP
 EOF

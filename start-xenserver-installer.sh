@@ -54,7 +54,6 @@ touch \$1/tmp/postinst.sh.executed
 cp /firstboot.sh \$1/etc/firstboot.d/95-firstboot
 chmod 777 \$1/etc/firstboot.d/95-firstboot
 sed -ie "s,PasswordAuthentication yes,PasswordAuthentication no,g" \$1/etc/ssh/sshd_config
-echo "$AUTHORIZED_KEYS" > \$1/root/.ssh/authorized_keys
 EOF
 
 cat > firstboot.sh << EOF
