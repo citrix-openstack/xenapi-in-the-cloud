@@ -136,15 +136,13 @@ copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
 copy_to_ubuntu first-cloud-boot/xenserver-firstboot-access-staging.sh /root/xenserver-first-cloud-boot.sh
 copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenserver.sh
 
-# You should take a snapshot at this point
-
-
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
     bash -s -- << EOF
 set -eux
 touch /root/xenserver-run.request
+# You should shutdown and take a snapshot at this point
 reboot
 EOF
 
