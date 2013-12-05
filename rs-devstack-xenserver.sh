@@ -147,7 +147,7 @@ function copy_to_ubuntu() {
 scp \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" \
-    "$src" "root@$VM_IP:$src"
+    "$src" "root@$VM_IP:$tgt"
 }
 
 copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
