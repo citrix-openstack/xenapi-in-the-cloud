@@ -137,6 +137,21 @@ sleep 30
 
 wait_for_ssh "$VM_IP"
 
+function copy_to_ubuntu() {
+    local src
+    local tgt
+
+    src="$1"
+    tgt="$2"
+
+scp \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" \
+    "$src" "root@$VM_IP:$src"
+}
+
+copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
+
 {
 cat prepare-to-firstboot.sh
 echo "touch /root/boot-to-xenserver"
