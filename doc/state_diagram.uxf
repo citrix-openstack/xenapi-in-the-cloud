@@ -328,7 +328,7 @@ wait_for_ssh</panel_attributes>
     <coordinates>
       <x>340</x>
       <y>590</y>
-      <w>170</w>
+      <w>130</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>Ubuntu running
@@ -339,7 +339,7 @@ bg=#DD4814
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>620</x>
+      <x>600</x>
       <y>590</y>
       <w>170</w>
       <h>40</h>
@@ -352,14 +352,14 @@ bg=#DD4814
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>480</x>
+      <x>440</x>
       <y>560</y>
-      <w>160</w>
+      <w>180</w>
       <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-cp upstart</panel_attributes>
-    <additional_attributes>140;50;30;50</additional_attributes>
+copy upstart</panel_attributes>
+    <additional_attributes>160;50;30;50</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
@@ -377,13 +377,13 @@ bg=#DD4814
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>760</x>
+      <x>740</x>
       <y>560</y>
-      <w>234</w>
+      <w>242</w>
       <h>110</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-cp boot-to-xenserver.sh
+copy boot-to-xenserver.sh
 </panel_attributes>
     <additional_attributes>130;90;130;50;30;50</additional_attributes>
   </element>
