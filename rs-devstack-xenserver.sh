@@ -151,11 +151,13 @@ scp \
 }
 
 copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
+copy_to_ubuntu first-cloud-boot/ubuntu-generate-firstboot.sh /root/generate-firstboot.sh
 
 {
-cat prepare-to-firstboot.sh
-echo "touch /root/boot-to-xenserver"
-echo "reboot"
+cat << EOF
+touch /root/boot-to-xenserver
+reboot
+EOF
 } | ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
