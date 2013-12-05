@@ -168,4 +168,8 @@ Finished.
 To access XenServer:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
+
+To access the Staging VM:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" user@$VM_IP
 EOF
