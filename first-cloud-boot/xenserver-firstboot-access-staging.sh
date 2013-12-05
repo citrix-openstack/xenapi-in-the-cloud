@@ -140,7 +140,7 @@ EXECUTE_ON_STAGING_VM
 echo "" | run_on_vm sudo crontab -
 
 # Disable temporary private key and reboot
-cat .ssh/authorized_keys | run_on_vm "cat > .ssh/authorized_keys && sudo reboot"
+cat /root/.ssh/authorized_keys | run_on_vm "cat > .ssh/authorized_keys && sudo reboot"
 
 # Enable password based authentication on XenServer
 sed -ie "s,PasswordAuthentication no,PasswordAuthentication yes,g" /etc/ssh/sshd_config
