@@ -3,6 +3,19 @@ set -exu
 
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
+FIRSTBOOT_SCRIPT="$3"
+
+if ! [ -e "$FIRSTBOOT_SCRIPT" ]; then
+    cat << EOF
+ERROR: firstboot script $FIRSTBOOT_SCRIPT not found
+
+available firstboot scripts are:
+
+    first-cloud-boot/xenserver-firstboot-access-dom0.sh
+    first-cloud-boot/xenserver-firstboot-access-staging-vm.sh
+EOF
+    exit 1
+fi
 
 VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
 
@@ -100,7 +113,7 @@ sleep 5
 
 nova unrescue "$VM_ID"
 
-sleep 5
+sleep 10
 
 wait_for_ssh "$VM_IP"
 
@@ -132,10 +145,8 @@ scp \
 }
 
 copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
+copy_to_ubuntu "$FIRSTBOOT_SCRIPT" /root/xenserver-first-cloud-boot.sh
 copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenserver.sh
-
-# You should take a snapshot at this point
-
 
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
@@ -143,6 +154,7 @@ ssh -q \
     bash -s -- << EOF
 set -eux
 touch /root/xenserver-run.request
+# You should shutdown and take a snapshot at this point
 reboot
 EOF
 
@@ -156,4 +168,8 @@ Finished.
 To access XenServer:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
+
+To access the Staging VM:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" user@$VM_IP
 EOF

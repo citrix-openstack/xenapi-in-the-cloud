@@ -17,18 +17,16 @@ GATEWAY=$(grep -m 1 "gateway" /etc/network/interfaces | sed -e 's,^ *,,g' | cut 
 MACADDRESS=$(ifconfig eth0 | sed -ne 's/.*HWaddr \(.*\)$/\1/p' | tr -d " ")
 NAMESERVERS=$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 | sort | uniq | tr '\n' , | sed -e 's/,$//g')
 
-cat > /mnt/xenserver/etc/firstboot.d/96-cloud << ON_XS
-#!/bin/bash
-set -eux
+cat > /mnt/xenserver/root/cloud-settings << CLOUD_SETTINGS
+ADDRESS="$ADDRESS"
+NETMASK="$NETMASK"
+GATEWAY="$GATEWAY"
+MACADDRESS="$MACADDRESS"
+NAMESERVERS="$NAMESERVERS"
+CLOUD_SETTINGS
 
-while ! xe host-list --minimal; do
-    sleep 1
-done
+cat root/xenserver-first-cloud-boot.sh > /mnt/xenserver/etc/firstboot.d/96-cloud
 
-xe pif-introduce device=eth0 host-uuid=\$(xe host-list --minimal) mac=$MACADDRESS
-xe pif-reconfigure-ip uuid=\$(xe pif-list device=eth0 --minimal) mode=static IP=$ADDRESS netmask=$NETMASK gateway=$GATEWAY DNS=$NAMESERVERS
-xe host-management-reconfigure pif-uuid=\$(xe pif-list device=eth0 --minimal)
-ON_XS
 chmod 777 /mnt/xenserver/etc/firstboot.d/96-cloud
 
 umount /mnt/xenserver

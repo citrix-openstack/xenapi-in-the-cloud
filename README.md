@@ -16,4 +16,8 @@ In this case, I will use `xspassword`.
 
 With all the parameters, the command should look like this:
 
-    ./rs-xenserver.sh "xs62" "xspassword"
+    ./rs-xenserver.sh "xs62" "xspassword" first-cloud-boot/xenserver-firstboot-access-dom0.sh
+
+## Start XenServer with a Staging VM
+
+    ./rs-xenserver.sh "xs62" "xspassword" first-cloud-boot/xenserver-firstboot-access-staging-vm.sh
