@@ -37,7 +37,7 @@ xe host-management-reconfigure pif-uuid=$NEW_PIF
 
 # Create vifs for the staging VM
 xe vif-create vm-uuid=$VM network-uuid=$HOST_INT_NET device=0
-xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MAC device=1
+xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MACADDRESS device=1
 xe vif-create vm-uuid=$VM network-uuid=$NEW_MGT_NET device=2
 
 xe vm-start uuid=$VM
