@@ -100,7 +100,7 @@ sleep 5
 
 nova unrescue "$VM_ID"
 
-sleep 5
+sleep 10
 
 wait_for_ssh "$VM_IP"
 
