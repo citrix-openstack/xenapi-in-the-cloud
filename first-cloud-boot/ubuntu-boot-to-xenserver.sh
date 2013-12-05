@@ -17,22 +17,15 @@ GATEWAY=$(grep -m 1 "gateway" /etc/network/interfaces | sed -e 's,^ *,,g' | cut 
 MACADDRESS=$(ifconfig eth0 | sed -ne 's/.*HWaddr \(.*\)$/\1/p' | tr -d " ")
 NAMESERVERS=$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 | sort | uniq | tr '\n' , | sed -e 's/,$//g')
 
-cat > /mnt/xenserver/etc/firstboot.d/96-cloud << SET_ENV_WAIT_FOR_XAPI
-#!/bin/bash
-set -eux
-
+cat > /mnt/xenserver/root/cloud-settings << CLOUD_SETTINGS
 ADDRESS="$ADDRESS"
 NETMASK="$NETMASK"
 GATEWAY="$GATEWAY"
 MACADDRESS="$MACADDRESS"
 NAMESERVERS="$NAMESERVERS"
+CLOUD_SETTINGS
 
-while ! xe host-list --minimal; do
-    sleep 1
-done
-SET_ENV_WAIT_FOR_XAPI
-
-cat root/xenserver-first-cloud-boot.sh >> /mnt/xenserver/etc/firstboot.d/96-cloud
+cat root/xenserver-first-cloud-boot.sh > /mnt/xenserver/etc/firstboot.d/96-cloud
 
 chmod 777 /mnt/xenserver/etc/firstboot.d/96-cloud
 
