@@ -17,6 +17,7 @@ NEW_MGT_NET=$(xe network-create name-label=mgt name-description=mgt)
 NEW_MGT_VLAN=$(xe vlan-create vlan=100 pif-uuid=$PIF network-uuid=$NEW_MGT_NET)
 NEW_PIF=$(xe pif-list VLAN=100 device=eth0 --minimal)
 VM=$(xe vm-list name-label="Staging VM" --minimal)
+DNS_ADDRESSES=$(echo "$NAMESERVERS" | sed -e "s/,/ /g")
 
 xe pif-reconfigure-ip \
     uuid=$PIF \
