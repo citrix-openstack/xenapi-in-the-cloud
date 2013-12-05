@@ -154,22 +154,11 @@ ssh -q \
     bash -s -- << EOF
 set -eux
 touch /root/xenserver-run.request
-# You should shutdown and take a snapshot at this point
-reboot
+halt -p
 EOF
-
-sleep 10
-
-wait_for_ssh "$VM_IP"
 
 cat << EOF
 Finished.
 
-To access XenServer:
-
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
-
-To access the Staging VM:
-
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" user@$VM_IP
+No wait until the instance "$VM_NAME" halts. Snapshot it after that.
 EOF
