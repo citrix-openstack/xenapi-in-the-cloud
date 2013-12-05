@@ -4,6 +4,7 @@ set -exu
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
 FIRSTBOOT_SCRIPT="$3"
+DEVMODE="${DEVMODE:-false}"
 
 if ! [ -e "$FIRSTBOOT_SCRIPT" ]; then
     cat << EOF
@@ -154,11 +155,27 @@ ssh -q \
     bash -s -- << EOF
 set -eux
 touch /root/xenserver-run.request
-halt -p
+if [ "true" = "$DEVMODE" ]; then
+    reboot
+else
+    halt -p
+fi
 EOF
 
-cat << EOF
+if [ "true" = "$DEVMODE" ]; then
+    sleep 10
+    wait_for_ssh "$VM_IP"
+    cat << EOF
+Instance is accessible through ssh:
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
+    or if you launched the Staging VM, the username is "user":
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" user@$VM_IP
+EOF
+else
+    cat << EOF
 Finished.
 
-No wait until the instance "$VM_NAME" halts. Snapshot it after that.
+Wait until the instance "$VM_NAME" halts. Snapshot it after that.
 EOF
+fi
