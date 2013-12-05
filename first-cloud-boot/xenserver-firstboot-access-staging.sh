@@ -87,12 +87,59 @@ auto eth2
 EOF
 } | run_on_vm "sudo tee -a /etc/network/interfaces"
 
+# Configure shorewall and dnsmasq
+run_on_vm "bash -s" << EXECUTE_ON_STAGING_VM
+sudo tee /etc/shorewall/interfaces << EOF
+net      eth1           detect          dhcp,tcpflags,nosmurfs
+lan      eth2           detect          dhcp
+EOF
+
+sudo tee /etc/shorewall/zones << EOF
+fw      firewall
+net     ipv4
+lan     ipv4
+EOF
+
+sudo tee /etc/shorewall/policy << EOF
+lan             net             ACCEPT
+lan             fw              ACCEPT
+fw              net             ACCEPT
+fw              lan             ACCEPT
+net             all             DROP
+all             all             REJECT          info
+EOF
+
+sudo tee /etc/shorewall/rules << EOF
+ACCEPT  net                     fw      tcp     22
+EOF
+
+
+sudo tee /etc/shorewall/masq << EOF
+eth1 eth2
+EOF
+
+# Turn on IP forwarding
+sudo sed -i /etc/shorewall/shorewall.conf \
+    -e 's/IP_FORWARDING=.*/IP_FORWARDING=On/g'
+
+# Enable shorewall on startup
+sudo sed -i /etc/default/shorewall \
+    -e 's/startup=.*/startup=1/g'
+
+# Configure dnsmasq
+sudo tee -a /etc/dnsmasq.conf << EOF
+interface=eth2
+dhcp-range=192.168.33.50,192.168.33.150,12h
+bind-interfaces
+EOF
+EXECUTE_ON_STAGING_VM
+
 # Remove authorized_keys updater
 echo "" | run_on_vm sudo crontab -
 
 # Disable temporary private key and reboot
 cat .ssh/authorized_keys | run_on_vm "cat > .ssh/authorized_keys && sudo reboot"
 
-# Enable password based authentication
+# Enable password based authentication on XenServer
 sed -ie "s,PasswordAuthentication no,PasswordAuthentication yes,g" /etc/ssh/sshd_config
 /etc/init.d/sshd restart
