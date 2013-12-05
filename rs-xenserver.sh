@@ -3,6 +3,19 @@ set -exu
 
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
+FIRSTBOOT_SCRIPT="$3"
+
+if ! [ -e "$FIRSTBOOT_SCRIPT" ]; then
+    cat << EOF
+ERROR: firstboot script $FIRSTBOOT_SCRIPT not found
+
+available firstboot scripts are:
+
+    first-cloud-boot/xenserver-firstboot-access-dom0.sh
+    first-cloud-boot/xenserver-firstboot-access-staging-vm.sh
+EOF
+    exit 1
+fi
 
 VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
 
@@ -132,8 +145,7 @@ scp \
 }
 
 copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
-#copy_to_ubuntu first-cloud-boot/xenserver-firstboot-access-dom0.sh /root/xenserver-first-cloud-boot.sh
-copy_to_ubuntu first-cloud-boot/xenserver-firstboot-access-staging.sh /root/xenserver-first-cloud-boot.sh
+copy_to_ubuntu "$FIRSTBOOT_SCRIPT" /root/xenserver-first-cloud-boot.sh
 copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenserver.sh
 
 ssh -q \
