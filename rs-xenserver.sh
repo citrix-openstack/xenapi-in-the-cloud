@@ -132,6 +132,7 @@ scp \
 }
 
 copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
+copy_to_ubuntu first-cloud-boot/xenserver-firstboot-access-dom0.sh /root/xenserver-first-cloud-boot.sh
 copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenserver.sh
 
 # You should take a snapshot at this point
