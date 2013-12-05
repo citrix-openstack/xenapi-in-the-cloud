@@ -155,10 +155,15 @@ copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenser
 
 # You should take a snapshot at this point
 
-echo "reboot" | ssh -q \
+
+ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS"
+    bash -s -- "$XENSERVER_PASSWORD" "$AUTHORIZED_KEYS" << EOF
+set -eux
+touch /root/xenserver-run.request
+reboot
+EOF
 
 sleep 10
 
