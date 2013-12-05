@@ -151,49 +151,9 @@ sleep 10
 wait_for_ssh "$VM_IP"
 
 cat << EOF
-development breakpoint.
+Finished.
 
 To access XenServer:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
-EOF
-
-exit 0
-
-# Launch a domU and use dom0's IP there
-cat replace-dom0-with-a-vm.sh | ssh  -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" root@$VM_IP \
-    bash -s --
-
-# A small delay is needed here...
-sleep 5
-
-wait_for_ssh "$VM_IP"
-
-# Setup the VM as a router
-cat setup-routing.sh | ssh  -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
-    bash -s --
-
-sleep 5
-
-# Run devstack
-{
-cat << EOF
-XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
-EOF
-cat start-devstack.sh
-} | ssh  -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$ACCESS_PRIVKEY" user@$VM_IP \
-    bash -s --
-
-cat << EOF
-Finished!
-
-To access your machine, type:
-
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$ACCESS_PRIVKEY" user@$VM_IP
 EOF
