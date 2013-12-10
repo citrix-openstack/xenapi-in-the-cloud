@@ -98,7 +98,16 @@ sleep 10
 
 wait_for_ssh "$VM_IP"
 
-exit 0
+ssh -q \
+    -o BatchMode=yes -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+    bash -s -- << EOF
+set -eux
+
+rm -f /usr/share/initramfs-tools/hooks/resize
+rm -f /usr/share/initramfs-tools/scripts/local-premount/resize
+update-initramfs -u
+EOF
 
 {
 cat << EOF
