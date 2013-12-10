@@ -89,34 +89,16 @@ done
 
 wait_for_ssh "$VM_IP"
 
-ssh -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- << EOF
-set -eux
-halt -p
-EOF
-
-sleep 5
-
-nova rescue "$VM_ID"
-
-sleep 5
-
-wait_for_ssh "$VM_IP"
-
-cat shrink-xvdb.sh | ssh -q \
+cat shrink-with-initramfs.sh | ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
     bash -s --
 
-sleep 5
-
-nova unrescue "$VM_ID"
-
 sleep 10
 
 wait_for_ssh "$VM_IP"
+
+exit 0
 
 {
 cat << EOF
