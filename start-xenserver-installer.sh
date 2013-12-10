@@ -1,7 +1,7 @@
 set -eux
 
 wget -qO xs62.iso http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
-wget -qO staging_vm.xva http://downloads.vmd.citrix.com/OpenStack/minvm.xva
+wget -qO staging_vm.xva http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva
 
 sed -ie 's/^GRUB_HIDDEN_TIMEOUT/#GRUB_HIDDEN_TIMEOUT/g' /etc/default/grub
 sed -ie 's/^GRUB_HIDDEN_TIMEOUT_QUIET/#GRUB_HIDDEN_TIMEOUT_QUIET/g' /etc/default/grub
