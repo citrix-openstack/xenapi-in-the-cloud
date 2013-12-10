@@ -63,7 +63,7 @@ resize2fs /dev/xvda1 4G
 NUMBER_OF_BLOCKS=\$(tune2fs -l /dev/xvda1 | grep "Block count" | tr -d " " | cut -d":" -f 2)
 
 # Convert them to 512 byte sectors
-SIZE_OF_PARTITION=\$(expr $NUMBER_OF_BLOCKS * 8)
+SIZE_OF_PARTITION=\$(expr \$NUMBER_OF_BLOCKS * 8)
 
 # Sleep - otherwise sfdisk complains "BLKRRPART: Device or resource busy"
 sleep 2
