@@ -56,8 +56,8 @@ ssh-keygen -f tempkey -P ""
 DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 
 # Authenticate temporary key to Staging VM
-xenstore-write /local/domain/$DOMID/authorized_keys/user "$(cat tempkey.pub)"
-xenstore-chmod -u /local/domain/$DOMID/authorized_keys/user r$DOMID
+xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat tempkey.pub)"
+xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
 
 function run_on_vm() {
     ssh \
@@ -65,7 +65,7 @@ function run_on_vm() {
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
         -o BatchMode=yes \
-        "user@$VM_IP" "$@"
+        "root@$VM_IP" "$@"
 }
 
 while ! run_on_vm true < /dev/null > /dev/null 2>&1; do
@@ -87,22 +87,22 @@ auto eth2
   address 192.168.33.1
   netmask 255.255.255.0
 EOF
-} | run_on_vm "sudo tee -a /etc/network/interfaces"
+} | run_on_vm "tee -a /etc/network/interfaces"
 
 # Configure shorewall and dnsmasq
 run_on_vm "bash -s" << EXECUTE_ON_STAGING_VM
-sudo tee /etc/shorewall/interfaces << EOF
+tee /etc/shorewall/interfaces << EOF
 net      eth1           detect          dhcp,tcpflags,nosmurfs
 lan      eth2           detect          dhcp
 EOF
 
-sudo tee /etc/shorewall/zones << EOF
+tee /etc/shorewall/zones << EOF
 fw      firewall
 net     ipv4
 lan     ipv4
 EOF
 
-sudo tee /etc/shorewall/policy << EOF
+tee /etc/shorewall/policy << EOF
 lan             net             ACCEPT
 lan             fw              ACCEPT
 fw              net             ACCEPT
@@ -111,25 +111,25 @@ net             all             DROP
 all             all             REJECT          info
 EOF
 
-sudo tee /etc/shorewall/rules << EOF
+tee /etc/shorewall/rules << EOF
 ACCEPT  net                     fw      tcp     22
 EOF
 
 
-sudo tee /etc/shorewall/masq << EOF
+tee /etc/shorewall/masq << EOF
 eth1 eth2
 EOF
 
 # Turn on IP forwarding
-sudo sed -i /etc/shorewall/shorewall.conf \
+sed -i /etc/shorewall/shorewall.conf \
     -e 's/IP_FORWARDING=.*/IP_FORWARDING=On/g'
 
 # Enable shorewall on startup
-sudo sed -i /etc/default/shorewall \
+sed -i /etc/default/shorewall \
     -e 's/startup=.*/startup=1/g'
 
 # Configure dnsmasq
-sudo tee -a /etc/dnsmasq.conf << EOF
+tee -a /etc/dnsmasq.conf << EOF
 interface=eth2
 dhcp-range=192.168.33.50,192.168.33.150,12h
 bind-interfaces
@@ -137,10 +137,10 @@ EOF
 EXECUTE_ON_STAGING_VM
 
 # Remove authorized_keys updater
-echo "" | run_on_vm sudo crontab -
+echo "" | run_on_vm crontab -
 
 # Disable temporary private key and reboot
-cat /root/.ssh/authorized_keys | run_on_vm "cat > .ssh/authorized_keys && sudo reboot"
+cat /root/.ssh/authorized_keys | run_on_vm "cat > /root/.ssh/authorized_keys && reboot"
 
 # Enable password based authentication on XenServer
 sed -ie "s,PasswordAuthentication no,PasswordAuthentication yes,g" /etc/ssh/sshd_config
