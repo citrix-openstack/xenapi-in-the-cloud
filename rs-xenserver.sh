@@ -89,84 +89,18 @@ done
 
 wait_for_ssh "$VM_IP"
 
-cat shrink-with-initramfs.sh | ssh -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s --
-
-sleep 10
-
-wait_for_ssh "$VM_IP"
-
-ssh -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- << EOF
-set -eux
-
-rm -f /usr/share/initramfs-tools/hooks/resize
-rm -f /usr/share/initramfs-tools/scripts/local-premount/resize
-update-initramfs -u
-EOF
-
-{
-cat << EOF
-XENSERVER_PASSWORD="$XENSERVER_PASSWORD"
-EOF
-cat start-xenserver-installer.sh
-} | ssh -q \
-    -o BatchMode=yes -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s --
-
-sleep 30
-
-wait_for_ssh "$VM_IP"
-
-function copy_to_ubuntu() {
-    local src
-    local tgt
-
-    src="$1"
-    tgt="$2"
-
 scp \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" \
-    "$src" "root@$VM_IP:$tgt"
-}
-
-copy_to_ubuntu first-cloud-boot/ubuntu-upstart.conf /etc/init/xenserver.conf
-copy_to_ubuntu "$FIRSTBOOT_SCRIPT" /root/xenserver-first-cloud-boot.sh
-copy_to_ubuntu first-cloud-boot/ubuntu-boot-to-xenserver.sh /root/boot-to-xenserver.sh
+    "xenserver-upstart.sh" "root@$VM_IP:xenserver-upstart.sh"
 
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash -s -- << EOF
-set -eux
-touch /root/xenserver-run.request
-if [ "true" = "$DEVMODE" ]; then
-    reboot
-else
-    halt -p
-fi
-EOF
+    bash /root/xenserver-upstart.sh
 
-if [ "true" = "$DEVMODE" ]; then
-    sleep 10
-    wait_for_ssh "$VM_IP"
-    cat << EOF
+cat << EOF
 Instance is accessible through ssh:
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" root@$VM_IP
-    or if you launched the Staging VM, the username is "user":
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "$TEMPORARY_PRIVKEY" user@$VM_IP
 EOF
-else
-    cat << EOF
-Finished.
-
-Wait until the instance "$VM_NAME" halts. Snapshot it after that.
-EOF
-fi
