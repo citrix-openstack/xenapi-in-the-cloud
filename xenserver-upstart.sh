@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eux
 
-STATE_FILE=".state"
 THIS_FILE="/root/xenserver-upstart.sh"
+STATE_FILE="${THIS_FILE}.state"
 
 function set_state() {
     local state
