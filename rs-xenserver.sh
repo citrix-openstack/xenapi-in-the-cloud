@@ -3,20 +3,7 @@ set -exu
 
 VM_NAME="$1"
 XENSERVER_PASSWORD="$2"
-FIRSTBOOT_SCRIPT="$3"
 DEVMODE="${DEVMODE:-false}"
-
-if ! [ -e "$FIRSTBOOT_SCRIPT" ]; then
-    cat << EOF
-ERROR: firstboot script $FIRSTBOOT_SCRIPT not found
-
-available firstboot scripts are:
-
-    first-cloud-boot/xenserver-firstboot-access-dom0.sh
-    first-cloud-boot/xenserver-firstboot-access-staging-vm.sh
-EOF
-    exit 1
-fi
 
 VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
 
