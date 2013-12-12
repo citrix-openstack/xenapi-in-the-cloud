@@ -133,6 +133,7 @@ case "$(get_state)" in
         update_initramfs
         delete_resizing_initramfs_config
         set_state "RESIZED"
+        reboot
         ;;
     "RESIZED")
         exit 1
