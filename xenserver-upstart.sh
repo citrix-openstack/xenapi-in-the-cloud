@@ -290,8 +290,8 @@ function wait_for_xapi() {
 function forget_networking() {
     xe host-management-disable
     IFS=,
-    for pif in \$(xe pif-list --minimal); do
-        xe pif-forget uuid=\$pif
+    for pif in $(xe pif-list --minimal); do
+        xe pif-forget uuid=$pif
     done
     unset IFS
 }
