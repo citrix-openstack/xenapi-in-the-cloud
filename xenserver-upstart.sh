@@ -185,8 +185,8 @@ function print_rclocal() {
 # This is the contents of the rc.local file on XenServer
 mkdir -p /mnt/ubuntu
 mount /dev/sda1 /mnt/ubuntu
-ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE
-ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE
+ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE || true
+ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE || true
 if /bin/bash $THIS_FILE; then
     reboot
 fi
