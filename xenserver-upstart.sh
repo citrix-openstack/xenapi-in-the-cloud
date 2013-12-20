@@ -174,7 +174,7 @@ function print_postinst_file() {
 #!/bin/sh
 touch \$1/tmp/postinst.sh.executed
 cp \$1/etc/rc.d/rc.local \$1/etc/rc.d/rc.local.backup
-cat $rclocal > /etc/rc.d/rc.local
+cat $rclocal >> \$1/etc/rc.d/rc.local
 EOF
 }
 
