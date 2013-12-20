@@ -176,7 +176,7 @@ touch \$1/tmp/postinst.sh.executed
 cp \$1/etc/rc.d/rc.local \$1/etc/rc.d/rc.local.backup
 cat $rclocal >> \$1/etc/rc.d/rc.local
 cp /tmp/ramdisk/cloud-settings \$1/root/
-cp /tmp/ramdisk/authorized_keys \$1/root/
+cp /tmp/ramdisk/authorized_keys \$1/root/.ssh/
 EOF
 }
 
@@ -278,7 +278,7 @@ function store_authorized_keys() {
     
     targetpath="$1"
 
-    cp /root/authorized_keys $1
+    cp /root/.ssh/authorized_keys $1
 }
 
 function wait_for_xapi() {
