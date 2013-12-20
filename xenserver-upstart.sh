@@ -129,6 +129,69 @@ function create_done_file() {
     touch /root/done.stamp
 }
 
+function download_xenserver_files() {
+    wget -qO /root/xenserver.iso \
+        http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
+}
+
+function download_minvm_xva() {
+    wget -qO /root/staging_vm.xva \
+        http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva
+}
+
+function print_answerfile() {
+    local repository
+    local postinst
+    local xenserver_pass
+
+    repository="$1"
+    postinst="$2"
+    xenserver_pass="$3"
+
+    cat << EOF
+<?xml version="1.0"?>
+<installation srtype="ext">
+<primary-disk preserve-first-partition="true">sda</primary-disk>
+<keymap>us</keymap>
+<root-password>$xenserver_pass</root-password>
+<source type="url">$repository</source>
+<admin-interface name="eth0" proto="static">
+<ip>192.168.34.2</ip>
+<subnet-mask>255.255.255.0</subnet-mask>
+<gateway>192.168.34.1</gateway>
+</admin-interface>
+<timezone>America/Los_Angeles</timezone>
+<script stage="filesystem-populated" type="url">$postinst</script>
+</installation>
+EOF
+}
+
+function print_postinst_file() {
+    cat > postinst.sh << EOF
+#!/bin/sh
+touch \$1/tmp/postinst.sh.executed
+cp \$1/etc/rc.d/rc.local \$1/etc/rc.d/rc.local.backup
+cat $rclocal > /etc/rc.d/rc.local
+EOF
+}
+
+function print_rclocal() {
+    cat << EOF
+# This is the contents of the rc.local file on XenServer
+EOF
+}
+
+function create_ramdisk_contents() {
+    mkdir /xsinst
+    ln /root/xenserver.iso /xsinst/xenserver.iso
+    print_rclocal > /xsinst/rclocal
+    print_postinst_file "/tmp/ramdisk/rclocal" > /xsinst/postinst.sh
+    print_answerfile \
+        "file:///tmp/ramdisk" \
+        "file:///tmp/ramdisk/postinst.sh" \
+        "xspassword" > /xsinst/answerfile.xml
+}
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -139,6 +202,9 @@ case "$(get_state)" in
         reboot
         ;;
     "RESIZED")
+        download_xenserver_files
+        download_minvm_xva
+        create_ramdisk_contents
         create_done_file
         exit 1
         ;;
