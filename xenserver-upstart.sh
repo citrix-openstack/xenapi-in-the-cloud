@@ -284,7 +284,7 @@ function store_authorized_keys() {
 }
 
 function wait_for_xapi() {
-    while ! xe host-list --minimal; do
+    while ! [ -e /var/run/xapi_init_complete.cookie ]; do
         sleep 1
     done
 }
