@@ -189,7 +189,7 @@ ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE
 ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE
 if /bin/bash $THIS_FILE; then
     reboot
-done
+fi
 EOF
 }
 
