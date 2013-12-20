@@ -222,6 +222,41 @@ function extract_xs_installer() {
     umount $mountdir
 }
 
+function generate_xs_installer_grub_config() {
+    local bootfiles
+    local answerfile
+
+    bootfiles="$1"
+    answerfile="$2"
+
+    cat > /etc/grub.d/45_xs-install << EOF
+cat << XS_INSTALL
+menuentry 'XenServer installer' {
+    multiboot $bootfiles/xen.gz dom0_max_vcpus=1-2 dom0_mem=max:752M com1=115200,8n1 console=com1,vga
+    module $bootfiles/vmlinuz xencons=hvc console=tty0 console=hvc0 make-ramdisk=/dev/sda1 answerfile=$answerfile install
+    module $bootfiles/install.img
+}
+XS_INSTALL
+EOF
+    chmod +x /etc/grub.d/45_xs-install
+}
+
+function configure_grub() {
+    sed -ie 's/^GRUB_HIDDEN_TIMEOUT/#GRUB_HIDDEN_TIMEOUT/g' /etc/default/grub
+    sed -ie 's/^GRUB_HIDDEN_TIMEOUT_QUIET/#GRUB_HIDDEN_TIMEOUT_QUIET/g' /etc/default/grub
+    # sed -ie 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
+    sed -ie 's/^.*GRUB_TERMINAL=.*$/GRUB_TERMINAL=console/g' /etc/default/grub
+    sed -ie 's/GRUB_DEFAULT=0/GRUB_DEFAULT=saved/g' /etc/default/grub
+}
+
+function update_grub() {
+    update-grub
+}
+
+function set_xenserver_installer_as_nextboot() {
+    grub-set-default "XenServer installer"
+}
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -236,6 +271,13 @@ case "$(get_state)" in
         download_minvm_xva
         create_ramdisk_contents
         extract_xs_installer /root/xenserver.iso /opt/xs-install
+        generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
+        configure_grub
+        update_grub
+        set_xenserver_installer_as_nextboot
+        set_state "XENSERVER"
+        ;;
+    "XENSERVER")
         create_done_file
         exit 1
         ;;
