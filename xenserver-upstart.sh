@@ -329,8 +329,8 @@ case "$(get_state)" in
         configure_grub
         update_grub
         set_xenserver_installer_as_nextboot
-        store_cloud_settings /xsinst/
-        store_authorized_keys /xsinst/
+        store_cloud_settings /xsinst/cloud-settings
+        store_authorized_keys /xsinst/authorized_keys
         set_state "XENSERVER"
         ;;
     "XENSERVER")
