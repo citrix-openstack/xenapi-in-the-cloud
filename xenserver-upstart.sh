@@ -175,6 +175,8 @@ function print_postinst_file() {
 touch \$1/tmp/postinst.sh.executed
 cp \$1/etc/rc.d/rc.local \$1/etc/rc.d/rc.local.backup
 cat $rclocal >> \$1/etc/rc.d/rc.local
+cp /tmp/ramdisk/cloud-settings \$1/root/
+cp /tmp/ramdisk/authorized_keys \$1/root/
 EOF
 }
 
@@ -257,6 +259,29 @@ function set_xenserver_installer_as_nextboot() {
     grub-set-default "XenServer installer"
 }
 
+function store_cloud_settings() {
+    local targetpath
+
+    targetpath="$1"
+
+    cat > $targetpath << EOF
+ADDRESS=$(grep -m 1 "address" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
+NETMASK=$(grep -m 1 "netmask" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
+GATEWAY=$(grep -m 1 "gateway" /etc/network/interfaces | sed -e 's,^ *,,g' | cut -d " " -f 2)
+MACADDRESS=$(ifconfig eth0 | sed -ne 's/.*HWaddr \(.*\)$/\1/p' | tr -d " ")
+NAMESERVERS=$(cat /etc/resolv.conf | grep nameserver | cut -d " " -f 2 | sort | uniq | tr '\n' , | sed -e 's/,$//g')
+EOF
+}
+
+function store_authorized_keys() {
+    local targetpath
+    
+    targetpath="$1"
+
+    cp /root/authorized_keys $1
+}
+
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -275,6 +300,8 @@ case "$(get_state)" in
         configure_grub
         update_grub
         set_xenserver_installer_as_nextboot
+        store_cloud_settings /xsinst/
+        store_authorized_keys /xsinst/
         set_state "XENSERVER"
         ;;
     "XENSERVER")
