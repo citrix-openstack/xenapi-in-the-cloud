@@ -86,6 +86,17 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
     bash /root/xenserver-upstart.sh
 
+while true; do
+    wait_for_ssh "$VM_IP"
+    if ssh -q \
+        -o BatchMode=yes -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
+        test -e /root/done.stamp; then
+        break
+    fi
+    sleep 10
+done
+
 cat << EOF
 Instance is accessible through ssh:
 

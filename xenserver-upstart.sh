@@ -125,6 +125,9 @@ end script
 EOF
 }
 
+function create_done_file() {
+    touch /root/done.stamp
+}
 
 case "$(get_state)" in
     "START")
@@ -136,6 +139,7 @@ case "$(get_state)" in
         reboot
         ;;
     "RESIZED")
+        create_done_file
         exit 1
         ;;
 esac
