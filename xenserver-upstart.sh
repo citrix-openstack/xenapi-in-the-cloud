@@ -167,6 +167,9 @@ EOF
 }
 
 function print_postinst_file() {
+    local rclocal
+    rclocal="$1"
+
     cat > postinst.sh << EOF
 #!/bin/sh
 touch \$1/tmp/postinst.sh.executed
