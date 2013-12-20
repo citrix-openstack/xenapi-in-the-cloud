@@ -170,7 +170,7 @@ function print_postinst_file() {
     local rclocal
     rclocal="$1"
 
-    cat > postinst.sh << EOF
+    cat << EOF
 #!/bin/sh
 touch \$1/tmp/postinst.sh.executed
 cp \$1/etc/rc.d/rc.local \$1/etc/rc.d/rc.local.backup
@@ -181,6 +181,13 @@ EOF
 function print_rclocal() {
     cat << EOF
 # This is the contents of the rc.local file on XenServer
+mkdir -p /mnt/ubuntu
+mount /dev/sda1 /mnt/ubuntu
+ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE
+ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE
+if /bin/bash $THIS_FILE; then
+    reboot
+done
 EOF
 }
 
