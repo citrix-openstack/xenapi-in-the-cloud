@@ -311,6 +311,55 @@ function configure_dom0_to_cloud() {
     xe host-management-reconfigure pif-uuid=$(xe pif-list device=eth0 --minimal)
 }
 
+function add_boot_config_for_ubuntu() {
+    local ubuntu_bootfiles
+    local bootfiles
+
+    ubuntu_bootfiles="$1"
+    bootfiles="$2"
+
+    local kernel
+    local initrd
+
+    kernel=$(ls -1c $ubuntu_bootfiles/vmlinuz-* | head -1)
+    initrd=$(ls -1c $ubuntu_bootfiles/initrd.img-* | head -1)
+
+    cp $kernel $bootfiles/vmlinuz-ubuntu
+    cp $initrd $bootfiles/initrd-ubuntu
+
+    cat >> $bootfiles/extlinux.conf << UBUNTU
+label ubuntu
+    LINUX $bootfiles/vmlinuz-ubuntu
+    APPEND root=/dev/xvda1 ro quiet splash
+    INITRD $bootfiles/initrd-ubuntu
+UBUNTU
+}
+
+function start_ubuntu_on_next_boot() {
+    local bootfiles
+
+    bootfiles="$1"
+
+    sed -ie 's,default xe-serial,default ubuntu,g' $bootfiles/extlinux.conf
+}
+
+function start_xenserver_on_next_boot() {
+    local bootfiles
+
+    bootfiles="$1"
+
+    sed -ie 's,default ubuntu,default xe-serial,g' $bootfiles/extlinux.conf
+}
+
+function mount_dom0_fs() {
+    local target
+
+    target="$1"
+
+    mkdir -p $target
+    mount /dev/xvda2 $target
+}
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -337,7 +386,17 @@ case "$(get_state)" in
         wait_for_xapi
         forget_networking
         configure_dom0_to_cloud
+        add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
+        start_ubuntu_on_next_boot /boot/
+        set_state "CLOUDBOOT"
         create_done_file
         exit 1
+        ;;
+    "CLOUDBOOT")
+        mount_dom0_fs /mnt/dom0
+        store_cloud_settings /mnt/dom0/root/cloud-settings
+        store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
+        start_xenserver_on_next_boot /mnt/dom0/boot
+        set_state "XENSERVER"
         ;;
 esac
