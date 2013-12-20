@@ -202,6 +202,26 @@ function create_ramdisk_contents() {
         "xspassword" > /xsinst/answerfile.xml
 }
 
+function extract_xs_installer() {
+    local isofile
+    local targetpath
+
+    isofile="$1"
+    targetpath="$2"
+
+    local mountdir
+
+    mountdir=$(mktemp -d)
+    mount -o loop $isofile $mountdir
+    mkdir -p $targetpath
+    cp \
+        $mountdir/install.img \
+        $mountdir/boot/xen.gz \
+        $mountdir/boot/vmlinuz \
+        $targetpath
+    umount $mountdir
+}
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -215,6 +235,7 @@ case "$(get_state)" in
         download_xenserver_files
         download_minvm_xva
         create_ramdisk_contents
+        extract_xs_installer /root/xenserver.iso /opt/xs-install
         create_done_file
         exit 1
         ;;
