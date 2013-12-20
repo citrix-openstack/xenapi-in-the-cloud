@@ -365,11 +365,12 @@ case "$(get_state)" in
         create_upstart_config
         create_resizing_initramfs_config
         update_initramfs
-        delete_resizing_initramfs_config
         set_state "RESIZED"
         reboot
         ;;
     "RESIZED")
+        delete_resizing_initramfs_config
+        update_initramfs
         download_xenserver_files
         download_minvm_xva
         create_ramdisk_contents
