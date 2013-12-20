@@ -281,6 +281,35 @@ function store_authorized_keys() {
     cp /root/authorized_keys $1
 }
 
+function wait_for_xapi() {
+    while ! xe host-list --minimal; do
+        sleep 1
+    done
+}
+
+function forget_networking() {
+    xe host-management-disable
+    IFS=,
+    for pif in \$(xe pif-list --minimal); do
+        xe pif-forget uuid=\$pif
+    done
+    unset IFS
+}
+
+function configure_dom0_to_cloud() {
+    . /root/cloud-settings
+
+    xe pif-introduce \
+        device=eth0 host-uuid=$(xe host-list --minimal) mac=$MACADDRESS
+    xe pif-reconfigure-ip \
+        uuid=$(xe pif-list device=eth0 --minimal) \
+        mode=static \
+        IP=$ADDRESS \
+        netmask=$NETMASK \
+        gateway=$GATEWAY \
+        DNS=$NAMESERVERS
+    xe host-management-reconfigure pif-uuid=$(xe pif-list device=eth0 --minimal)
+}
 
 case "$(get_state)" in
     "START")
@@ -305,6 +334,9 @@ case "$(get_state)" in
         set_state "XENSERVER"
         ;;
     "XENSERVER")
+        wait_for_xapi
+        forget_networking
+        configure_dom0_to_cloud
         create_done_file
         exit 1
         ;;
