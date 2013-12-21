@@ -132,6 +132,10 @@ function create_done_file() {
     touch /root/done.stamp
 }
 
+function create_done_file_on_appliance() {
+    echo "touch /root/done.stamp" | run_on_appliance
+}
+
 function download_xenserver_files() {
     wget -qO /root/xenserver.iso \
         http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
@@ -492,7 +496,7 @@ function emit_done_signal() {
     if [ -z "$ADDITIONAL_PARAMETERS" ]; then
         create_done_file
     elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
-        echo "Not implemented yet"
+        create_done_file_on_appliance
     fi
 }
 
