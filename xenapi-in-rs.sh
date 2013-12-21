@@ -445,6 +445,7 @@ function configure_appliance_to_cloud() {
     for vif in $(xe vif-list vm-uuid=$VM --minimal); do
         xe vif-destroy uuid=$vif
     done
+    unset IFS
 
     # Create vifs for the appliance
     xe vif-create vm-uuid=$VM network-uuid=$HOST_INT_NET device=0
