@@ -142,7 +142,9 @@ function trigger_prepare_for_snapshot() {
 # Prepare the box for snapshotting
 set -eux
 echo "PREPARE4SNAPSHOT" > /root/$INSTALLER_SCRIPT.state
-bash /root/$INSTALLER_SCRIPT
+
+# This will trigger the process
+/etc/rc.d/rc.local
 EOF
 }
 

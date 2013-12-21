@@ -604,7 +604,6 @@ case "$(get_state)" in
         remove_snapshot_ready_stamp
         remove_done_signal
         set_state "UBUNTU_NO_RESTART"
-        reboot
         ;;
     "UBUNTU_NO_RESTART")
         set_state "GET_CLOUD_PARAMS"
