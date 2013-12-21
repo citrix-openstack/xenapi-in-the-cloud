@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux
 
-THIS_FILE="/root/xenserver-upstart.sh"
+THIS_FILE="/root/xenapi-in-rs.sh"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"

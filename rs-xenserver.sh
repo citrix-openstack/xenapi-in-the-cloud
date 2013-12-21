@@ -10,6 +10,8 @@ VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
 TEMPORARY_PRIVKEY="$VM_NAME.pem"
 TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
 
+INSTALLER_SCRIPT="xenapi-in-rs.sh"
+
 if nova keypair-list | grep -q "$TEMPORARY_PRIVKEY_NAME"; then
     echo "ERROR: A keypair already exists with the name $TEMPORARY_PRIVKEY_NAME"
     exit 1
@@ -79,12 +81,12 @@ wait_for_ssh "$VM_IP"
 scp \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" \
-    "xenserver-upstart.sh" "root@$VM_IP:xenserver-upstart.sh"
+    "$INSTALLER_SCRIPT" "root@$VM_IP:$INSTALLER_SCRIPT"
 
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash /root/xenserver-upstart.sh minvm
+    bash /root/$INSTALLER_SCRIPT minvm
 
 while true; do
     wait_for_ssh "$VM_IP"
