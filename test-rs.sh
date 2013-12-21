@@ -3,6 +3,24 @@ set -exu
 
 INSTALLER_SCRIPT="xenapi-in-rs.sh"
 
+function main() {
+    launch_vm testvm "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)"
+    start_install
+    wait_till_done
+    trigger_prepare_for_snapshot
+    wait_till_snapshottable
+    perform_snapshot testvm testimage
+    ./kill-testvm.sh
+    rm -f kill-testvm.sh
+    launch_vm snapvm testimage
+    wait_till_done
+    ./kill-snapvm.sh
+    nova image-delete testimage
+    rm -f kill-snapvm.sh
+
+    echo "ALL TESTS PASSED"
+}
+
 function wait_for_ssh() {
     set +x
     while ! echo "kk" | nc -w 1 "$VM_IP" 22 > /dev/null 2>&1; do
@@ -138,22 +156,4 @@ function perform_snapshot() {
     nova image-create --poll "$vm_name" "$snapshot_name"
 }
 
-launch_vm testvm "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)"
-start_install
-wait_till_done
-trigger_prepare_for_snapshot
-wait_till_snapshottable
-perform_snapshot testvm testimage
-./kill-testvm.sh
-rm -f kill-testvm.sh
-launch_vm snapvm testimage
-wait_till_done
-./kill-snapvm.sh
-nova image-delete testimage
-rm -f kill-snapvm.sh
-
-cat << EOF
-CONGRATULATIONS!
-
-All tests passed.
-EOF
+main
