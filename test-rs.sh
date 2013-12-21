@@ -137,6 +137,10 @@ trigger_prepare_for_snapshot
 wait_till_snapshottable
 perform_snapshot testvm testimage
 ./kill-testvm.sh
+rm -f kill-testvm.sh
 launch_vm snapvm testimage
 wait_till_done
 ./kill-snapvm.sh
+nova image-delete testimage
+rm -f kill-snapvm.sh
+
