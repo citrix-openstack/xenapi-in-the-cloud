@@ -52,6 +52,7 @@ rm -f "$PRIVKEY"
 EOF
 
     nova boot \
+        --poll \
 	--image "$image_name" \
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
