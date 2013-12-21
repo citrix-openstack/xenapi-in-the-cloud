@@ -411,7 +411,7 @@ function run_on_appliance() {
     done
 
     ssh \
-        -i tempkey \
+        -i /root/dom0key \
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
         -o BatchMode=yes \
@@ -477,13 +477,13 @@ function configure_appliance_to_cloud() {
     done
 
     if [ "$APP_IMPORTED_NOW" = "true" ]; then
-        rm -f tempkey
-        rm -f tempkey.pub
-        ssh-keygen -f tempkey -P "" -C "dom0"
+        rm -f /root/dom0key
+        rm -f /root/dom0key.pub
+        ssh-keygen -f /root/dom0key -P "" -C "dom0"
         DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 
         # Authenticate temporary key to appliance
-        xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat tempkey.pub)"
+        xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat /root/dom0key.pub)"
         xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
 
         while ! run_on_appliance true < /dev/null > /dev/null 2>&1; do
@@ -521,7 +521,7 @@ EOF
     # Update ssh keys and reboot, so settings applied
     {
         echo "# The following key is used by dom0 to reconfigure this appliance"
-        cat tempkey.pub
+        cat /root/dom0key.pub
         cat /root/.ssh/authorized_keys
     } | run_on_appliance "cat > /root/.ssh/authorized_keys && reboot"
 }
