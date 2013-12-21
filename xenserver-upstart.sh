@@ -4,6 +4,7 @@ set -eux
 THIS_FILE="/root/xenserver-upstart.sh"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
+ADDITIONAL_PARAMETERS="$@"
 
 function set_state() {
     local state
@@ -120,7 +121,7 @@ start on stopped rc RUNLEVEL=[2345]
 task
 
 script
-    /bin/bash $THIS_FILE >> $LOG_FILE 2>&1
+    /bin/bash $THIS_FILE "$ADDITIONAL_PARAMETERS" >> $LOG_FILE 2>&1
     reboot
 end script
 EOF
@@ -197,7 +198,7 @@ mount /dev/sda1 /mnt/ubuntu
 ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE || true
 ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE || true
 ln -s /mnt/ubuntu${LOG_FILE} $LOG_FILE || true
-if /bin/bash $THIS_FILE >> $LOG_FILE 2>&1 ; then
+if /bin/bash $THIS_FILE "$ADDITIONAL_PARAMETERS" >> $LOG_FILE 2>&1 ; then
     reboot
 fi
 EOF
