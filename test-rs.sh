@@ -5,12 +5,10 @@ INSTALLER_SCRIPT="xenapi-in-rs.sh"
 
 function wait_for_ssh() {
     set +x
-    echo -n "Waiting for port 22 on ${VM_IP}"
     while ! echo "kk" | nc -w 1 "$VM_IP" 22 > /dev/null 2>&1; do
             sleep 1
             echo -n "."
     done
-    echo "Connectable!"
     set -x
 }
 
@@ -88,24 +86,33 @@ function start_install() {
     $SSH -i $PRIVKEY root@$VM_IP bash /root/$INSTALLER_SCRIPT minvm
 }
 
-function wait_till_done() {
+function wait_till_file_exists() {
+    set +x
+    local fname
+
+    fname="$1"
+
+    echo -n "Waiting for $fname"
+
     while true; do
         wait_for_ssh
-        if $SSH -i $PRIVKEY root@$VM_IP test -e /root/done.stamp; then
+        if $SSH -i $PRIVKEY root@$VM_IP test -e $fname; then
             break
+        else
+            echo -n "."
+            sleep 10
         fi
-        sleep 10
     done
+    echo "Found!"
+    set -x
+}
+
+function wait_till_done() {
+    wait_till_file_exists /root/done.stamp
 }
 
 function wait_till_snapshottable() {
-    while true; do
-        wait_for_ssh
-        if $SSH -i $PRIVKEY root@$VM_IP test -e /root/snapshot.ok; then
-            break
-        fi
-        sleep 10
-    done
+    wait_till_file_exists /root/snapshot.ok
 }
 
 function trigger_prepare_for_snapshot() {
