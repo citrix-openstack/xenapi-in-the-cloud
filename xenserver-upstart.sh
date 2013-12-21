@@ -369,7 +369,7 @@ function wait_for_networking() {
     done
 }
 
-function run_on_vm() {
+function run_on_appliance() {
     local vm_ip
 
     vm_ip="$1"
@@ -439,7 +439,7 @@ function configure_minvm_to_cloud() {
     xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
 
 
-    while ! run_on_vm $VM_IP true < /dev/null > /dev/null 2>&1; do
+    while ! run_on_appliance $VM_IP true < /dev/null > /dev/null 2>&1; do
         echo "waiting for key to be activated"
         sleep 1
     done
@@ -458,13 +458,13 @@ auto eth2
   address 192.168.33.1
   netmask 255.255.255.0
 EOF
-    } | run_on_vm $VM_IP "tee -a /etc/network/interfaces"
+    } | run_on_appliance $VM_IP "tee -a /etc/network/interfaces"
 
     # Remove authorized_keys updater
-    echo "" | run_on_vm $VM_IP crontab -
+    echo "" | run_on_appliance $VM_IP crontab -
 
     # Disable temporary private key and reboot
-    cat /root/.ssh/authorized_keys | run_on_vm $VM_IP "cat >> /root/.ssh/authorized_keys && reboot"
+    cat /root/.ssh/authorized_keys | run_on_appliance $VM_IP "cat >> /root/.ssh/authorized_keys && reboot"
 }
 
 function configure_appliance() {
