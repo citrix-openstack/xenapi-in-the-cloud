@@ -397,33 +397,33 @@ case "$(get_state)" in
         set_xenserver_installer_as_nextboot
         store_cloud_settings /xsinst/cloud-settings
         store_authorized_keys /xsinst/authorized_keys
-        set_state "XENSERVER"
+        set_state "XAPIFIRSTBOOT"
         ;;
-    "XENSERVER")
+    "XAPIFIRSTBOOT")
         wait_for_xapi
         forget_networking
         configure_dom0_to_cloud
         add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
         start_ubuntu_on_next_boot /boot/
-        set_state "CLOUDBOOT"
+        set_state "GET_CLOUD_PARAMS"
         create_done_file
         exit 1
         ;;
-    "CLOUDBOOT")
+    "GET_CLOUD_PARAMS")
         mount_dom0_fs /mnt/dom0
         remove_done_file /mnt/dom0
         wait_for_networking
         store_cloud_settings /mnt/dom0/root/cloud-settings
         store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
         start_xenserver_on_next_boot /mnt/dom0/boot
-        set_state "XENSERVERCLOUD"
+        set_state "XAPI"
         ;;
-    "XENSERVERCLOUD")
+    "XAPI")
         wait_for_xapi
         forget_networking
         configure_dom0_to_cloud
         start_ubuntu_on_next_boot /boot/
-        set_state "CLOUDBOOT"
+        set_state "GET_CLOUD_PARAMS"
         create_done_file
         exit 1
         ;;
