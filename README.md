@@ -5,17 +5,45 @@ Tools to run a XenAPI managed hypervisor in the cloud
 
 ## Start XenServer in the Rackspace cloud
 
-To launch an instance, first make sure, that you have `nova` installed, and
-that your environment has all the settings. For setting up your environment
-and nova, please refer to [the official Rackspace documentation](http://docs.rackspace.com/servers/api/v2/cs-gettingstarted/content/section_gs_install_nova.html).
+To launch a XenServer in the Rackspace cloud, launch an instance with the
+following parameters:
 
-To launch a XenServer in the Rackspace cloud:
+ - flavor: `performance1-8`
+ - image:  `Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)`
 
-    ./rs-xenserver.sh "xs62"
+Copy the `xenapi-in-rs.sh` script to `/root/`:
 
-The name of the instance will be `xs62`, and a minimal precise VM will be
-listening on the public IP address. The XenServer will be accessible on the IP
-address: `192.168.33.2`. The password for the XenServer is `xspassword`.
+    scp xenapi-in-rs.sh root@instance:/root/xenapi-in-rs.sh
+
+And execute that script:
+
+    ssh root@instance /root/xenapi-in-rs.sh minvm
+
+Now, you have to monitor the public IP with ssh, and look for a stamp file:
+`/root/done.stamp`. Whenever you successfully logged in, and the file exists,
+the transformation finished:
+
+A minimal precise VM will be listening on the public IP address. The XenServer
+will be accessible on the IP address: `192.168.33.2`. The password for the
+XenServer is `xspassword`.
+
+## Testing
+
+Make sure, that you have `nova` installed, and that your environment has all
+the settings. For setting up your environment and nova, please refer to
+[the official Rackspace documentation](http://docs.rackspace.com/servers/api/v2/cs-gettingstarted/content/section_gs_install_nova.html).
+
+After these steps, run:
+
+    ./test-rs.sh tempvm
+
+Where `tempvm` is the name for the instance, could be anything. No VM should
+exist with this name. A script, `kill-tempvm.sh` will be created to clean up
+the VM, should the test fail.
+
+Investigate the return code and its output. `0` return code indicates that the
+setup script works, and the instance could be used in a cloud environment,
+assuming proper use.
 
 ## How Does it Work?
 
