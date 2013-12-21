@@ -27,6 +27,8 @@ A minimal precise VM will be listening on the public IP address. The XenServer
 will be accessible on the IP address: `192.168.33.2`. The password for the
 XenServer is `xspassword`.
 
+Halt the instance before you snapshot it.
+
 ## Testing
 
 Make sure, that you have `nova` installed, and that your environment has all
@@ -35,15 +37,11 @@ the settings. For setting up your environment and nova, please refer to
 
 After these steps, run:
 
-    ./test-rs.sh tempvm
-
-Where `tempvm` is the name for the instance, could be anything. No VM should
-exist with this name. A script, `kill-tempvm.sh` will be created to clean up
-the VM, should the test fail.
+    ./test-rs.sh
 
 Investigate the return code and its output. `0` return code indicates that the
 setup script works, and the instance could be used in a cloud environment,
-assuming proper use.
+assuming proper use (halt before snapshot)
 
 ## How Does it Work?
 
