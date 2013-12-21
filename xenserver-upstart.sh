@@ -130,6 +130,14 @@ function create_done_file() {
     touch /root/done.stamp
 }
 
+function remove_done_file() {
+    local root
+
+    root="$1"
+
+    rm -f "$root/root/done.stamp"
+}
+
 function download_xenserver_files() {
     wget -qO /root/xenserver.iso \
         http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
@@ -397,9 +405,19 @@ case "$(get_state)" in
         ;;
     "CLOUDBOOT")
         mount_dom0_fs /mnt/dom0
+        remove_done_file /mnt/dom0
         store_cloud_settings /mnt/dom0/root/cloud-settings
         store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
         start_xenserver_on_next_boot /mnt/dom0/boot
-        set_state "XENSERVER"
+        set_state "XENSERVERCLOUD"
+        ;;
+    "XENSERVERCLOUD")
+        wait_for_xapi
+        forget_networking
+        configure_dom0_to_cloud
+        start_ubuntu_on_next_boot /boot/
+        set_state "CLOUDBOOT"
+        create_done_file
+        exit 1
         ;;
 esac
