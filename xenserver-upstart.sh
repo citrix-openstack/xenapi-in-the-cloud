@@ -447,7 +447,7 @@ function configure_appliance_to_cloud() {
 
     rm -f tempkey
     rm -f tempkey.pub
-    ssh-keygen -f tempkey -P ""
+    ssh-keygen -f tempkey -P "" -C "dom0"
 
     DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 
