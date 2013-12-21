@@ -2,7 +2,6 @@
 set -exu
 
 VM_NAME="$1"
-XENSERVER_PASSWORD="$2"
 DEVMODE="${DEVMODE:-false}"
 
 VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
