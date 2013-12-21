@@ -480,8 +480,11 @@ EOF
     # Remove authorized_keys updater
     echo "" | run_on_appliance crontab -
 
-    # Disable temporary private key and reboot
-    cat /root/.ssh/authorized_keys | run_on_appliance "cat >> /root/.ssh/authorized_keys && reboot"
+    # Enable access from outside
+    {
+        cat tempkey.pub
+        cat /root/.ssh/authorized_keys
+    } | run_on_appliance "cat > /root/.ssh/authorized_keys && reboot"
 }
 
 function configure_appliance() {
