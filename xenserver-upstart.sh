@@ -310,7 +310,6 @@ function configure_dom0_to_cloud() {
         netmask=$NETMASK \
         gateway=$GATEWAY \
         DNS=$NAMESERVERS
-    sleep 1
     xe host-management-reconfigure pif-uuid=$(xe pif-list device=eth0 --minimal)
 }
 
