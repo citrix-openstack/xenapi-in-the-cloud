@@ -371,9 +371,17 @@ function wait_for_networking() {
 
 function run_on_appliance() {
     local vm_ip
+    local vm
 
-    vm_ip="$1"
-    shift
+    vm=$(xe vm-list name-label="Staging VM" --minimal)
+
+    [ -n "$vm" ]
+
+    # Wait until Staging VM is accessible
+    while ! ping -c 1 "${vm_ip:-}" > /dev/null 2>&1; do
+        vm_ip=$(xe vm-param-get param-name=networks uuid=$vm | sed -e 's,^.*0/ip: ,,g' | sed -e 's,;.*$,,g')
+        sleep 1
+    done
 
     ssh \
         -i tempkey \
@@ -439,7 +447,7 @@ function configure_minvm_to_cloud() {
     xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
 
 
-    while ! run_on_appliance $VM_IP true < /dev/null > /dev/null 2>&1; do
+    while ! run_on_appliance true < /dev/null > /dev/null 2>&1; do
         echo "waiting for key to be activated"
         sleep 1
     done
@@ -458,13 +466,13 @@ auto eth2
   address 192.168.33.1
   netmask 255.255.255.0
 EOF
-    } | run_on_appliance $VM_IP "tee -a /etc/network/interfaces"
+    } | run_on_appliance "tee -a /etc/network/interfaces"
 
     # Remove authorized_keys updater
-    echo "" | run_on_appliance $VM_IP crontab -
+    echo "" | run_on_appliance crontab -
 
     # Disable temporary private key and reboot
-    cat /root/.ssh/authorized_keys | run_on_appliance $VM_IP "cat >> /root/.ssh/authorized_keys && reboot"
+    cat /root/.ssh/authorized_keys | run_on_appliance "cat >> /root/.ssh/authorized_keys && reboot"
 }
 
 function configure_appliance() {
