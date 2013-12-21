@@ -377,6 +377,12 @@ function wait_for_networking() {
     done
 }
 
+function configure_appliance() {
+    if [ -z "$ADDITIONAL_PARAMETERS" ]; then
+        configure_dom0_to_cloud
+    fi
+}
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -403,7 +409,7 @@ case "$(get_state)" in
     "XAPIFIRSTBOOT")
         wait_for_xapi
         forget_networking
-        configure_dom0_to_cloud
+        configure_appliance
         add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
         start_ubuntu_on_next_boot /boot/
         set_state "GET_CLOUD_PARAMS"
@@ -422,7 +428,7 @@ case "$(get_state)" in
     "XAPI")
         wait_for_xapi
         forget_networking
-        configure_dom0_to_cloud
+        configure_appliance
         start_ubuntu_on_next_boot /boot/
         set_state "GET_CLOUD_PARAMS"
         create_done_file
