@@ -410,9 +410,11 @@ function configure_appliance_to_cloud() {
     NEW_MGT_VLAN=$(xe vlan-create vlan=100 pif-uuid=$PIF network-uuid=$NEW_MGT_NET)
     NEW_PIF=$(xe pif-list VLAN=100 device=eth0 --minimal)
     VM=$(xe vm-list name-label="$APPLIANCE_NAME" --minimal)
+    APP_IMPORTED_NOW="false"
     if [ -z "$VM" ]; then
         VM=$(xe vm-import filename=/mnt/ubuntu/root/staging_vm.xva)
         xe vm-param-set name-label="$APPLIANCE_NAME" uuid=$VM
+        APP_IMPORTED_NOW="true"
     fi
     DNS_ADDRESSES=$(echo "$NAMESERVERS" | sed -e "s/,/ /g")
 
@@ -445,24 +447,34 @@ function configure_appliance_to_cloud() {
         sleep 1
     done
 
-    rm -f tempkey
-    rm -f tempkey.pub
-    ssh-keygen -f tempkey -P "" -C "dom0"
+    if [ "$APP_IMPORTED_NOW" = "true" ]; then
+        rm -f tempkey
+        rm -f tempkey.pub
+        ssh-keygen -f tempkey -P "" -C "dom0"
+        DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 
-    DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
+        # Authenticate temporary key to appliance
+        xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat tempkey.pub)"
+        xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
 
-    # Authenticate temporary key to appliance
-    xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat tempkey.pub)"
-    xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
+        while ! run_on_appliance true < /dev/null > /dev/null 2>&1; do
+            echo "waiting for key to be activated"
+            sleep 1
+        done
 
+        # Remove authorized_keys updater
+        echo "" | run_on_appliance crontab -
+    fi
 
-    while ! run_on_appliance true < /dev/null > /dev/null 2>&1; do
-        echo "waiting for key to be activated"
-        sleep 1
-    done
-
+    # Update network configuration
     {
     cat << EOF
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
 auto eth1
 iface eth1 inet static
   address $ADDRESS
@@ -475,12 +487,9 @@ auto eth2
   address 192.168.33.1
   netmask 255.255.255.0
 EOF
-    } | run_on_appliance "tee -a /etc/network/interfaces"
+    } | run_on_appliance "tee /etc/network/interfaces"
 
-    # Remove authorized_keys updater
-    echo "" | run_on_appliance crontab -
-
-    # Enable access from outside
+    # Update ssh keys and reboot, so settings applied
     {
         cat tempkey.pub
         cat /root/.ssh/authorized_keys
