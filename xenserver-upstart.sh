@@ -131,14 +131,6 @@ function create_done_file() {
     touch /root/done.stamp
 }
 
-function remove_done_file() {
-    local root
-
-    root="$1"
-
-    rm -f "$root/root/done.stamp"
-}
-
 function download_xenserver_files() {
     wget -qO /root/xenserver.iso \
         http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
@@ -526,7 +518,6 @@ case "$(get_state)" in
         ;;
     "GET_CLOUD_PARAMS")
         mount_dom0_fs /mnt/dom0
-        remove_done_file /mnt/dom0
         wait_for_networking
         store_cloud_settings /mnt/dom0/root/cloud-settings
         store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
