@@ -7,7 +7,7 @@ function main() {
     launch_vm testvm "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)"
     start_install
     wait_till_done
-    trigger_prepare_for_snapshot
+    prepare_for_snapshot
     wait_till_snapshottable
     perform_snapshot testvm testimage
     ./kill-testvm.sh
@@ -130,10 +130,10 @@ function wait_till_done() {
 }
 
 function wait_till_snapshottable() {
-    wait_till_file_exists /root/snapshot.ok
+    sleep 20
 }
 
-function trigger_prepare_for_snapshot() {
+function prepare_for_snapshot() {
     # Copy over ssh key
     $SCP -i $PRIVKEY $PRIVKEY root@$VM_IP:key
     $SSH -i $PRIVKEY root@$VM_IP "chmod 0600 key"
@@ -141,10 +141,7 @@ function trigger_prepare_for_snapshot() {
 # These instructions are executed on dom0
 # Prepare the box for snapshotting
 set -eux
-echo "PREPARE4SNAPSHOT" > /root/$INSTALLER_SCRIPT.state
-
-# This will trigger the process
-/etc/rc.d/rc.local
+halt -p
 EOF
 }
 

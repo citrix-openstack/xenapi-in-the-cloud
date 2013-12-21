@@ -128,28 +128,12 @@ end script
 EOF
 }
 
-function remove_snapshot_ready_stamp() {
-    rm -f /mnt/ubuntu/root/snapshot.ok
-}
-
-function emit_snapshot_ready_signal() {
-    touch /root/snapshot.ok
-}
-
 function create_done_file() {
     touch /root/done.stamp
 }
 
-function remove_done_file() {
-    rm -f /root/done.stamp
-}
-
 function create_done_file_on_appliance() {
     echo "touch /root/done.stamp" | run_on_appliance
-}
-
-function remove_done_file_on_appliance() {
-    echo "rm -f /root/done.stamp" | run_on_appliance
 }
 
 function download_xenserver_files() {
@@ -542,14 +526,6 @@ function emit_done_signal() {
     fi
 }
 
-function remove_done_signal() {
-    if [ -z "$ADDITIONAL_PARAMETERS" ]; then
-        remove_done_file
-    elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
-        remove_done_file_on_appliance
-    fi
-}
-
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -598,16 +574,6 @@ case "$(get_state)" in
         start_ubuntu_on_next_boot /boot/
         set_state "GET_CLOUD_PARAMS"
         emit_done_signal
-        exit 1
-        ;;
-    "PREPARE4SNAPSHOT")
-        remove_snapshot_ready_stamp
-        remove_done_signal
-        set_state "UBUNTU_NO_RESTART"
-        ;;
-    "UBUNTU_NO_RESTART")
-        set_state "GET_CLOUD_PARAMS"
-        emit_snapshot_ready_signal
         exit 1
         ;;
 esac
