@@ -84,7 +84,7 @@ scp \
 ssh -q \
     -o BatchMode=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -i "$TEMPORARY_PRIVKEY" root@$VM_IP \
-    bash /root/xenserver-upstart.sh
+    bash /root/xenserver-upstart.sh minvm
 
 while true; do
     wait_for_ssh "$VM_IP"
