@@ -472,7 +472,7 @@ EOF
     echo "" | run_on_vm $VM_IP crontab -
 
     # Disable temporary private key and reboot
-    cat /root/.ssh/authorized_keys | run_on_vm $VM_IP "cat > /root/.ssh/authorized_keys && reboot"
+    cat /root/.ssh/authorized_keys | run_on_vm $VM_IP "cat >> /root/.ssh/authorized_keys && reboot"
 }
 
 function configure_appliance() {
@@ -480,6 +480,14 @@ function configure_appliance() {
         configure_dom0_to_cloud
     elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
         configure_minvm_to_cloud
+    fi
+}
+
+function emit_done_signal() {
+    if [ -z "$ADDITIONAL_PARAMETERS" ]; then
+        create_done_file
+    elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
+        echo "Not implemented yet"
     fi
 }
 
@@ -513,7 +521,7 @@ case "$(get_state)" in
         add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
         start_ubuntu_on_next_boot /boot/
         set_state "GET_CLOUD_PARAMS"
-        create_done_file
+        emit_done_signal
         exit 1
         ;;
     "GET_CLOUD_PARAMS")
@@ -531,7 +539,7 @@ case "$(get_state)" in
         configure_appliance
         start_ubuntu_on_next_boot /boot/
         set_state "GET_CLOUD_PARAMS"
-        create_done_file
+        emit_done_signal
         exit 1
         ;;
 esac
