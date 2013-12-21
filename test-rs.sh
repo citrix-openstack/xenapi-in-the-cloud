@@ -123,7 +123,7 @@ function trigger_prepare_for_snapshot() {
 # These instructions are executed on dom0
 # Prepare the box for snapshotting
 set -eux
-echo "PREPARE4SNAPSHOT" > /root/$INSTALLER_SCRIPT
+echo "PREPARE4SNAPSHOT" > /root/$INSTALLER_SCRIPT.state
 bash /root/$INSTALLER_SCRIPT
 EOF
 }
