@@ -144,3 +144,8 @@ wait_till_done
 nova image-delete testimage
 rm -f kill-snapvm.sh
 
+cat << EOF
+CONGRATULATIONS!
+
+All tests passed.
+EOF
