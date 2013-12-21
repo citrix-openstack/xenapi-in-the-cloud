@@ -440,6 +440,12 @@ function configure_appliance_to_cloud() {
 
     xe host-management-reconfigure pif-uuid=$NEW_PIF
 
+    # Purge all vifs of appliance
+    IFS=,
+    for vif in $(xe vif-list vm-uuid=$VM --minimal); do
+        xe vif-destroy uuid=$vif
+    done
+
     # Create vifs for the appliance
     xe vif-create vm-uuid=$VM network-uuid=$HOST_INT_NET device=0
     xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MACADDRESS device=1
