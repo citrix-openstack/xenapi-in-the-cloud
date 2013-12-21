@@ -491,6 +491,7 @@ EOF
 
     # Update ssh keys and reboot, so settings applied
     {
+        echo "# The following key is used by dom0 to reconfigure this appliance"
         cat tempkey.pub
         cat /root/.ssh/authorized_keys
     } | run_on_appliance "cat > /root/.ssh/authorized_keys && reboot"
