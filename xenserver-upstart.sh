@@ -396,7 +396,7 @@ function run_on_appliance() {
         "root@$vm_ip" "$@"
 }
 
-function configure_minvm_to_cloud() {
+function configure_appliance_to_cloud() {
     . /root/cloud-settings
 
     xe pif-introduce \
@@ -432,7 +432,7 @@ function configure_minvm_to_cloud() {
 
     xe host-management-reconfigure pif-uuid=$NEW_PIF
 
-    # Create vifs for the staging VM
+    # Create vifs for the appliance
     xe vif-create vm-uuid=$VM network-uuid=$HOST_INT_NET device=0
     xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MACADDRESS device=1
     xe vif-create vm-uuid=$VM network-uuid=$NEW_MGT_NET device=2
@@ -488,7 +488,7 @@ function configure_appliance() {
     if [ -z "$ADDITIONAL_PARAMETERS" ]; then
         configure_dom0_to_cloud
     elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
-        configure_minvm_to_cloud
+        configure_appliance_to_cloud
     fi
 }
 
