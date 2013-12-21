@@ -5,6 +5,7 @@ THIS_FILE="/root/xenserver-upstart.sh"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
+APPLIANCE_NAME="Appliance"
 
 function set_state() {
     local state
@@ -373,11 +374,11 @@ function run_on_appliance() {
     local vm_ip
     local vm
 
-    vm=$(xe vm-list name-label="Staging VM" --minimal)
+    vm=$(xe vm-list name-label="$APPLIANCE_NAME" --minimal)
 
     [ -n "$vm" ]
 
-    # Wait until Staging VM is accessible
+    # Wait until appliance is accessible
     while ! ping -c 1 "${vm_ip:-}" > /dev/null 2>&1; do
         vm_ip=$(xe vm-param-get param-name=networks uuid=$vm | sed -e 's,^.*0/ip: ,,g' | sed -e 's,;.*$,,g')
         sleep 1
@@ -404,7 +405,11 @@ function configure_minvm_to_cloud() {
     NEW_MGT_NET=$(xe network-create name-label=mgt name-description=mgt)
     NEW_MGT_VLAN=$(xe vlan-create vlan=100 pif-uuid=$PIF network-uuid=$NEW_MGT_NET)
     NEW_PIF=$(xe pif-list VLAN=100 device=eth0 --minimal)
-    VM=$(xe vm-import filename=/mnt/ubuntu/root/staging_vm.xva)
+    VM=$(xe vm-list name-label="$APPLIANCE_NAME" --minimal)
+    if [ -z "$VM" ]; then
+        VM=$(xe vm-import filename=/mnt/ubuntu/root/staging_vm.xva)
+        xe vm-param-set name-label="$APPLIANCE_NAME" uuid=$VM
+    fi
     DNS_ADDRESSES=$(echo "$NAMESERVERS" | sed -e "s/,/ /g")
 
     xe pif-reconfigure-ip \
@@ -430,7 +435,7 @@ function configure_minvm_to_cloud() {
 
     xe vm-start uuid=$VM
 
-    # Wait until Staging VM is accessible
+    # Wait until appliance is accessible
     while ! ping -c 1 "${VM_IP:-}" > /dev/null 2>&1; do
         VM_IP=$(xe vm-param-get param-name=networks uuid=$VM | sed -e 's,^.*0/ip: ,,g' | sed -e 's,;.*$,,g')
         sleep 1
@@ -442,7 +447,7 @@ function configure_minvm_to_cloud() {
 
     DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 
-    # Authenticate temporary key to Staging VM
+    # Authenticate temporary key to appliance
     xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat tempkey.pub)"
     xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
 
