@@ -2,10 +2,7 @@
 set -exu
 
 VM_NAME="$1"
-DEVMODE="${DEVMODE:-false}"
-
 VM_KILLER_SCRIPT="kill-$VM_NAME.sh"
-
 TEMPORARY_PRIVKEY="$VM_NAME.pem"
 TEMPORARY_PRIVKEY_NAME="tempkey-$VM_NAME"
 
