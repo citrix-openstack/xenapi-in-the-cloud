@@ -370,6 +370,12 @@ function mount_dom0_fs() {
     mount /dev/xvda2 $target
 }
 
+function wait_for_networking() {
+    while ! ping -c 1 xenserver.org > /dev/null 2>&1; do
+        sleep 1
+    done
+}
+
 case "$(get_state)" in
     "START")
         create_upstart_config
@@ -406,6 +412,7 @@ case "$(get_state)" in
     "CLOUDBOOT")
         mount_dom0_fs /mnt/dom0
         remove_done_file /mnt/dom0
+        wait_for_networking
         store_cloud_settings /mnt/dom0/root/cloud-settings
         store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
         start_xenserver_on_next_boot /mnt/dom0/boot
