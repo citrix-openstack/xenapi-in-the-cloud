@@ -11,6 +11,7 @@ apt-get install -qy shorewall dnsmasq
 tee /etc/shorewall/interfaces << EOF
 net eth1 detect dhcp,tcpflags,nosmurfs
 lan eth2 detect dhcp
+lan eth0 detect dhcp
 EOF
 
 tee /etc/shorewall/zones << EOF
