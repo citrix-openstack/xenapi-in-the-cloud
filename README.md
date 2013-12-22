@@ -11,17 +11,27 @@ following parameters:
  - flavor: `performance1-8`
  - image:  `Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)`
 
+Like this:
+
+    nova boot \
+        --poll \
+        --image "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)" \
+        --flavor "performance1-8" \
+        --key-name matekey instance
+
 Copy the `xenapi-in-rs.sh` script to `/root/`:
 
     scp xenapi-in-rs.sh root@instance:/root/xenapi-in-rs.sh
 
 And execute that script:
 
-    ssh root@instance /root/xenapi-in-rs.sh minvm
+    ssh root@instance bash /root/xenapi-in-rs.sh minvm
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file:
 `/root/done.stamp`. Whenever you successfully logged in, and the file exists,
 the transformation finished:
+
+    ./wait_until_done.sh instance matekey.priv
 
 A minimal precise VM will be listening on the public IP address. The XenServer
 will be accessible on the IP address: `192.168.33.2`. The password for the
