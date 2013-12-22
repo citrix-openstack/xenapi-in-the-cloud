@@ -5,7 +5,7 @@ VM_IP="$1"
 PRIVKEY="$2"
 
 COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
+SSH="ssh -q -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
 function main() {
     wait_till_done
