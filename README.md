@@ -35,7 +35,7 @@ Now, you have to monitor the public IP with ssh, and look for a stamp file:
 `/root/done.stamp`. Whenever you successfully logged in, and the file exists,
 the transformation finished:
 
-    ./wait_until_done.sh $IP matekey.priv
+    ./wait-until-done.sh $IP matekey.priv
 
 A minimal precise VM will be listening on the public IP address. The XenServer
 will be accessible on the IP address: `192.168.33.2`. The password for the
