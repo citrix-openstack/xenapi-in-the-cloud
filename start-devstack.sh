@@ -3,6 +3,7 @@
 set -eux
 
 XENSERVER="192.168.33.2"
+XENSERVER_PASSWORD="xspassword"
 
 apt-get -qy update
 apt-get install -qy shorewall dnsmasq
