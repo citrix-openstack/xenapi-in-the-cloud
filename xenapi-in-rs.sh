@@ -10,6 +10,7 @@ APPLIANCE_NAME="Appliance"
 
 XENSERVER_PASSWORD="xspassword"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
+STAGING_APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva"
 
 
 function main() {
@@ -200,8 +201,7 @@ function download_xenserver_files() {
 }
 
 function download_minvm_xva() {
-    wget -qO /root/staging_vm.xva \
-        http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva
+    wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
 }
 
 function print_answerfile() {
