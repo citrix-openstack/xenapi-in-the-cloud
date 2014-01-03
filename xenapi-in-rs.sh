@@ -132,14 +132,14 @@ set -e
 PREREQ=""
 
 prereqs () {
-	echo "\${PREREQ}"
+    echo "\${PREREQ}"
 }
 
 case "\${1}" in
-	prereqs)
-		prereqs
-		exit 0
-		;;
+    prereqs)
+        prereqs
+        exit 0
+        ;;
 esac
 
 . /usr/share/initramfs-tools/hook-functions
@@ -390,7 +390,7 @@ EOF
 
 function store_authorized_keys() {
     local targetpath
-    
+
     targetpath="$1"
 
     cp /root/.ssh/authorized_keys $1
