@@ -17,6 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Installation
+# ~~~~~~~~~~~~
 # 1.) Start an Ubuntu HVM instance in the Rackspace cloud
 # 2.) Copy this scipt to the instance's filesystem
 # 3.) Execute this script on the instance:
@@ -26,6 +28,15 @@
 #     through the public IP
 # 4.) Poll the public IP through ssh, and Wait until the file
 #     "$FILE_TO_TOUCH_ON_COMPLETION" exists
+#
+#
+# Snapshots
+# ~~~~~~~~~
+# 1.) Delete "$FILE_TO_TOUCH_ON_COMPLETION"
+# 2.) Shut down the instance
+# 3.) Create snapshot
+# 4.) When booting instances from the snapshot, poll
+#     "$FILE_TO_TOUCH_ON_COMPLETION"
 
 set -eux
 
