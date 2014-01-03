@@ -248,7 +248,7 @@ function print_answerfile() {
 <subnet-mask>255.255.255.0</subnet-mask>
 <gateway>192.168.34.1</gateway>
 </admin-interface>
-<timezone>America/Los_Angeles</timezone>
+<timezone>UTC</timezone>
 <script stage="filesystem-populated" type="url">$postinst</script>
 </installation>
 EOF
