@@ -1,4 +1,27 @@
 #!/bin/bash
+
+# Copyright (C) 2011-2014 OpenStack Foundation
+# Copyright (c) 2014 Citrix Systems, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+#
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# You execute this script in the Rackspace cloud, it will convert the
+# instance to a XenServer. A minimal precise VM will be accessible through
+# the public IP. The XenServer will be accessible through an internal
+# virtual "mgt" network.
+
 set -eux
 
 INSTALL_DIR="/opt/xenapi-in-rs"

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -exu
 
 INSTALL_DIR="/opt/xenapi-in-rs"
