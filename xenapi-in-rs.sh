@@ -48,9 +48,9 @@ function main() {
         "RESIZED")
             delete_resizing_initramfs_config
             update_initramfs
-            download_xenserver_files
+            download_xenserver_files /root/xenserver.iso
             download_minvm_xva
-            create_ramdisk_contents
+            create_ramdisk_contents /root/xenserver.iso /xsinst
             extract_xs_installer /root/xenserver.iso /opt/xs-install
             generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
             configure_grub
@@ -220,7 +220,11 @@ function create_done_file_on_appliance() {
 }
 
 function download_xenserver_files() {
-    wget -qO /root/xenserver.iso "$XENSERVER_ISO_URL"
+    local tgt
+
+    tgt="$1"
+
+    wget -qO "$tgt" "$XENSERVER_ISO_URL"
 }
 
 function download_minvm_xva() {
@@ -282,14 +286,20 @@ EOF
 }
 
 function create_ramdisk_contents() {
-    mkdir /xsinst
-    ln /root/xenserver.iso /xsinst/xenserver.iso
-    print_rclocal > /xsinst/rclocal
-    print_postinst_file "/tmp/ramdisk/rclocal" > /xsinst/postinst.sh
+    local isofile
+    local target_dir
+
+    isofile="$1"
+    target_dir="$2"
+
+    mkdir "$target_dir"
+    ln "$isofile" "$target_dir/xenserver.iso"
+    print_rclocal > "$target_dir/rclocal"
+    print_postinst_file "/tmp/ramdisk/rclocal" > "$target_dir/postinst.sh"
     print_answerfile \
         "file:///tmp/ramdisk" \
         "file:///tmp/ramdisk/postinst.sh" \
-        "$XENSERVER_PASSWORD" > /xsinst/answerfile.xml
+        "$XENSERVER_PASSWORD" > "$target_dir/answerfile.xml"
 }
 
 function extract_xs_installer() {
