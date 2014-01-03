@@ -18,7 +18,7 @@
 # limitations under the License.
 
 # 1.) Start an Ubuntu HVM instance in the Rackspace cloud
-# 2.) Copy this scipt to tha location "$THIS_FILE"
+# 2.) Copy this scipt to the location "$THIS_FILE"
 # 3.) Execute this script:
 #   - Without parameters to install only XenServer - dom0 accessible through
 #     the public IP
