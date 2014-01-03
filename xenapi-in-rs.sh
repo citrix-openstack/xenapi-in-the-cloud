@@ -9,6 +9,7 @@ ADDITIONAL_PARAMETERS="$@"
 APPLIANCE_NAME="Appliance"
 
 XENSERVER_PASSWORD="xspassword"
+XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
 
 
 function main() {
@@ -195,8 +196,7 @@ function create_done_file_on_appliance() {
 }
 
 function download_xenserver_files() {
-    wget -qO /root/xenserver.iso \
-        http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
+    wget -qO /root/xenserver.iso "$XENSERVER_ISO_URL"
 }
 
 function download_minvm_xva() {
