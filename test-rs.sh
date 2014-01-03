@@ -2,8 +2,8 @@
 
 set -exu
 
-INSTALL_DIR="/opt/xenapi-in-rs"
-INSTALLER_SCRIPT="xenapi-in-rs.sh"
+SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
+INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 
 function main() {
     launch_vm testvm "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)"
@@ -102,9 +102,9 @@ SCP="scp $COMMON_SSH_OPTIONS"
 SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
 function start_install() {
-    $SSH -i $PRIVKEY root@$VM_IP mkdir -p $INSTALL_DIR
-    $SCP -i $PRIVKEY $INSTALLER_SCRIPT "root@$VM_IP:$INSTALL_DIR/$INSTALLER_SCRIPT"
-    $SSH -i $PRIVKEY root@$VM_IP bash $INSTALL_DIR/$INSTALLER_SCRIPT minvm
+    $SSH -i $PRIVKEY root@$VM_IP mkdir -p $(dirname "$INSTALL_TARGET")
+    $SCP -i $PRIVKEY $SCRIPT_TO_INSTALL "root@$VM_IP:$INSTALL_TARGET"
+    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" minvm
 }
 
 function wait_till_file_exists() {

@@ -17,15 +17,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# You execute this script in the Rackspace cloud, it will convert the
-# instance to a XenServer. A minimal precise VM will be accessible through
-# the public IP. The XenServer will be accessible through an internal
-# virtual "mgt" network.
+# 1.) Start an Ubuntu HVM instance in the Rackspace cloud
+# 2.) Copy this scipt to tha location "$THIS_FILE"
+# 3.) Execute this script:
+#   - Without parameters to install only XenServer - dom0 accessible through
+#     the public IP
+#   - With the parameter "minvm" to install an appliance, and access that
+#     through the public IP
+# 4.) Poll the public IP through ssh, and Wait until a file
+#     "$FILE_TO_TOUCH_ON_COMPLETION" exists
 
 set -eux
 
-INSTALL_DIR="/opt/xenapi-in-rs"
-THIS_FILE="$INSTALL_DIR/xenapi-in-rs.sh"
+THIS_FILE="/opt/nodepool-scripts/xenserver_cloud.sh"
+INSTALL_DIR="$(dirname $THIS_FILE)"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
@@ -34,6 +39,7 @@ APPLIANCE_NAME="Appliance"
 XENSERVER_PASSWORD="xspassword"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
 STAGING_APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva"
+FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
 
 
 function main() {
@@ -212,11 +218,11 @@ EOF
 }
 
 function create_done_file() {
-    touch /root/done.stamp
+    touch "$FILE_TO_TOUCH_ON_COMPLETION"
 }
 
 function create_done_file_on_appliance() {
-    echo "touch /root/done.stamp" | run_on_appliance
+    echo "touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance
 }
 
 function download_xenserver_files() {
