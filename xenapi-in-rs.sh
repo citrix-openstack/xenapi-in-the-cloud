@@ -8,6 +8,8 @@ LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
 APPLIANCE_NAME="Appliance"
 
+XENSERVER_PASSWORD="xspassword"
+
 
 function main() {
     case "$(get_state)" in
@@ -264,7 +266,7 @@ function create_ramdisk_contents() {
     print_answerfile \
         "file:///tmp/ramdisk" \
         "file:///tmp/ramdisk/postinst.sh" \
-        "xspassword" > /xsinst/answerfile.xml
+        "$XENSERVER_PASSWORD" > /xsinst/answerfile.xml
 }
 
 function extract_xs_installer() {
