@@ -1,11 +1,111 @@
 #!/bin/bash
+
+# Copyright (C) 2011-2014 OpenStack Foundation
+# Copyright (c) 2014 Citrix Systems, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+#
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Installation
+# ~~~~~~~~~~~~
+# 1.) Start an Ubuntu HVM instance in the Rackspace cloud
+# 2.) Copy this scipt to the instance's filesystem
+# 3.) Execute this script on the instance:
+#   - Without any parameters to install only XenServer - dom0 will be
+#     accessible through the public IP
+#   - With the parameter "minvm" to install an appliance, and access that
+#     through the public IP
+# 4.) Poll the public IP through ssh, and Wait until the file
+#     "$FILE_TO_TOUCH_ON_COMPLETION" exists
+#
+#
+# Snapshots
+# ~~~~~~~~~
+# 1.) Delete "$FILE_TO_TOUCH_ON_COMPLETION"
+# 2.) Shut down the instance
+# 3.) Create snapshot
+# 4.) When booting instances from the snapshot, poll
+#     "$FILE_TO_TOUCH_ON_COMPLETION"
+
 set -eux
 
-THIS_FILE="/root/xenapi-in-rs.sh"
+THIS_FILE="$(readlink -f $0)"
+INSTALL_DIR="$(dirname $THIS_FILE)"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
 APPLIANCE_NAME="Appliance"
+
+XENSERVER_PASSWORD="xspassword"
+XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
+STAGING_APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva"
+FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
+
+
+function main() {
+    case "$(get_state)" in
+        "START")
+            create_upstart_config
+            create_resizing_initramfs_config
+            update_initramfs
+            set_state "RESIZED"
+            reboot
+            ;;
+        "RESIZED")
+            delete_resizing_initramfs_config
+            update_initramfs
+            download_xenserver_files /root/xenserver.iso
+            download_minvm_xva
+            create_ramdisk_contents /root/xenserver.iso /xsinst
+            extract_xs_installer /root/xenserver.iso /opt/xs-install
+            generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
+            configure_grub
+            update_grub
+            set_xenserver_installer_as_nextboot
+            store_cloud_settings /xsinst/cloud-settings
+            store_authorized_keys /xsinst/authorized_keys
+            set_state "XAPIFIRSTBOOT"
+            ;;
+        "XAPIFIRSTBOOT")
+            wait_for_xapi
+            forget_networking
+            configure_appliance
+            add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
+            start_ubuntu_on_next_boot /boot/
+            set_state "GET_CLOUD_PARAMS"
+            emit_done_signal
+            exit 1
+            ;;
+        "GET_CLOUD_PARAMS")
+            mount_dom0_fs /mnt/dom0
+            wait_for_networking
+            store_cloud_settings /mnt/dom0/root/cloud-settings
+            store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
+            start_xenserver_on_next_boot /mnt/dom0/boot
+            set_state "XAPI"
+            ;;
+        "XAPI")
+            wait_for_xapi
+            forget_networking
+            configure_appliance
+            start_ubuntu_on_next_boot /boot/
+            set_state "GET_CLOUD_PARAMS"
+            emit_done_signal
+            exit 1
+            ;;
+    esac
+}
 
 function set_state() {
     local state
@@ -129,21 +229,23 @@ EOF
 }
 
 function create_done_file() {
-    touch /root/done.stamp
+    touch "$FILE_TO_TOUCH_ON_COMPLETION"
 }
 
 function create_done_file_on_appliance() {
-    echo "touch /root/done.stamp" | run_on_appliance
+    echo "touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance
 }
 
 function download_xenserver_files() {
-    wget -qO /root/xenserver.iso \
-        http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso
+    local tgt
+
+    tgt="$1"
+
+    wget -qO "$tgt" "$XENSERVER_ISO_URL"
 }
 
 function download_minvm_xva() {
-    wget -qO /root/staging_vm.xva \
-        http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva
+    wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
 }
 
 function print_answerfile() {
@@ -167,7 +269,7 @@ function print_answerfile() {
 <subnet-mask>255.255.255.0</subnet-mask>
 <gateway>192.168.34.1</gateway>
 </admin-interface>
-<timezone>America/Los_Angeles</timezone>
+<timezone>UTC</timezone>
 <script stage="filesystem-populated" type="url">$postinst</script>
 </installation>
 EOF
@@ -192,9 +294,8 @@ function print_rclocal() {
 # This is the contents of the rc.local file on XenServer
 mkdir -p /mnt/ubuntu
 mount /dev/sda1 /mnt/ubuntu
-ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE || true
-ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE || true
-ln -s /mnt/ubuntu${LOG_FILE} $LOG_FILE || true
+mkdir -p $(dirname $INSTALL_DIR)
+ln -s /mnt/ubuntu${INSTALL_DIR} $INSTALL_DIR || true
 if /bin/bash $THIS_FILE "$ADDITIONAL_PARAMETERS" >> $LOG_FILE 2>&1 ; then
     reboot
 fi
@@ -202,14 +303,20 @@ EOF
 }
 
 function create_ramdisk_contents() {
-    mkdir /xsinst
-    ln /root/xenserver.iso /xsinst/xenserver.iso
-    print_rclocal > /xsinst/rclocal
-    print_postinst_file "/tmp/ramdisk/rclocal" > /xsinst/postinst.sh
+    local isofile
+    local target_dir
+
+    isofile="$1"
+    target_dir="$2"
+
+    mkdir "$target_dir"
+    ln "$isofile" "$target_dir/xenserver.iso"
+    print_rclocal > "$target_dir/rclocal"
+    print_postinst_file "/tmp/ramdisk/rclocal" > "$target_dir/postinst.sh"
     print_answerfile \
         "file:///tmp/ramdisk" \
         "file:///tmp/ramdisk/postinst.sh" \
-        "xspassword" > /xsinst/answerfile.xml
+        "$XENSERVER_PASSWORD" > "$target_dir/answerfile.xml"
 }
 
 function extract_xs_installer() {
@@ -526,54 +633,4 @@ function emit_done_signal() {
     fi
 }
 
-case "$(get_state)" in
-    "START")
-        create_upstart_config
-        create_resizing_initramfs_config
-        update_initramfs
-        set_state "RESIZED"
-        reboot
-        ;;
-    "RESIZED")
-        delete_resizing_initramfs_config
-        update_initramfs
-        download_xenserver_files
-        download_minvm_xva
-        create_ramdisk_contents
-        extract_xs_installer /root/xenserver.iso /opt/xs-install
-        generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
-        configure_grub
-        update_grub
-        set_xenserver_installer_as_nextboot
-        store_cloud_settings /xsinst/cloud-settings
-        store_authorized_keys /xsinst/authorized_keys
-        set_state "XAPIFIRSTBOOT"
-        ;;
-    "XAPIFIRSTBOOT")
-        wait_for_xapi
-        forget_networking
-        configure_appliance
-        add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
-        start_ubuntu_on_next_boot /boot/
-        set_state "GET_CLOUD_PARAMS"
-        emit_done_signal
-        exit 1
-        ;;
-    "GET_CLOUD_PARAMS")
-        mount_dom0_fs /mnt/dom0
-        wait_for_networking
-        store_cloud_settings /mnt/dom0/root/cloud-settings
-        store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
-        start_xenserver_on_next_boot /mnt/dom0/boot
-        set_state "XAPI"
-        ;;
-    "XAPI")
-        wait_for_xapi
-        forget_networking
-        configure_appliance
-        start_ubuntu_on_next_boot /boot/
-        set_state "GET_CLOUD_PARAMS"
-        emit_done_signal
-        exit 1
-        ;;
-esac
+main
