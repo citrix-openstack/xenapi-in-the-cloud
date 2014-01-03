@@ -61,5 +61,4 @@ assuming proper use (halt before snapshot)
 
 The idea is to have a single script (to make it easy to deploy), that is able
 to convert an instance to a XenServer. Look at the [xenapi-in-rs.sh](xenapi-in-rs.sh)
-file, and scroll to the end. There you will find the implementation of the
-state machine.
+file, the main function implements the state machine.
