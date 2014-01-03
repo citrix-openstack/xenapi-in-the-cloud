@@ -1,6 +1,7 @@
 #!/bin/bash
 set -exu
 
+INSTALL_DIR="/opt/xenapi-in-rs"
 INSTALLER_SCRIPT="xenapi-in-rs.sh"
 
 function main() {
@@ -100,8 +101,9 @@ SCP="scp $COMMON_SSH_OPTIONS"
 SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
 function start_install() {
-    $SCP -i $PRIVKEY $INSTALLER_SCRIPT "root@$VM_IP:$INSTALLER_SCRIPT"
-    $SSH -i $PRIVKEY root@$VM_IP bash /root/$INSTALLER_SCRIPT minvm
+    $SSH -i $PRIVKEY root@$VM_IP mkdir -p $INSTALL_DIR
+    $SCP -i $PRIVKEY $INSTALLER_SCRIPT "root@$VM_IP:$INSTALL_DIR/$INSTALLER_SCRIPT"
+    $SSH -i $PRIVKEY root@$VM_IP bash $INSTALL_DIR/$INSTALLER_SCRIPT minvm
 }
 
 function wait_till_file_exists() {

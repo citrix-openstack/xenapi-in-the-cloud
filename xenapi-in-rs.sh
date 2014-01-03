@@ -1,7 +1,8 @@
 #!/bin/bash
 set -eux
 
-THIS_FILE="/root/xenapi-in-rs.sh"
+INSTALL_DIR="/opt/xenapi-in-rs"
+THIS_FILE="$INSTALL_DIR/xenapi-in-rs.sh"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
@@ -192,9 +193,8 @@ function print_rclocal() {
 # This is the contents of the rc.local file on XenServer
 mkdir -p /mnt/ubuntu
 mount /dev/sda1 /mnt/ubuntu
-ln -s /mnt/ubuntu${THIS_FILE} $THIS_FILE || true
-ln -s /mnt/ubuntu${STATE_FILE} $STATE_FILE || true
-ln -s /mnt/ubuntu${LOG_FILE} $LOG_FILE || true
+mkdir -p $(dirname $INSTALL_DIR)
+ln -s $(dirname /mnt/ubuntu${INSTALL_DIR}) $INSTALL_DIR || true
 if /bin/bash $THIS_FILE "$ADDITIONAL_PARAMETERS" >> $LOG_FILE 2>&1 ; then
     reboot
 fi
