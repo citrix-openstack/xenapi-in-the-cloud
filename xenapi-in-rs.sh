@@ -8,6 +8,61 @@ LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
 APPLIANCE_NAME="Appliance"
 
+
+function main() {
+    case "$(get_state)" in
+        "START")
+            create_upstart_config
+            create_resizing_initramfs_config
+            update_initramfs
+            set_state "RESIZED"
+            reboot
+            ;;
+        "RESIZED")
+            delete_resizing_initramfs_config
+            update_initramfs
+            download_xenserver_files
+            download_minvm_xva
+            create_ramdisk_contents
+            extract_xs_installer /root/xenserver.iso /opt/xs-install
+            generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
+            configure_grub
+            update_grub
+            set_xenserver_installer_as_nextboot
+            store_cloud_settings /xsinst/cloud-settings
+            store_authorized_keys /xsinst/authorized_keys
+            set_state "XAPIFIRSTBOOT"
+            ;;
+        "XAPIFIRSTBOOT")
+            wait_for_xapi
+            forget_networking
+            configure_appliance
+            add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
+            start_ubuntu_on_next_boot /boot/
+            set_state "GET_CLOUD_PARAMS"
+            emit_done_signal
+            exit 1
+            ;;
+        "GET_CLOUD_PARAMS")
+            mount_dom0_fs /mnt/dom0
+            wait_for_networking
+            store_cloud_settings /mnt/dom0/root/cloud-settings
+            store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
+            start_xenserver_on_next_boot /mnt/dom0/boot
+            set_state "XAPI"
+            ;;
+        "XAPI")
+            wait_for_xapi
+            forget_networking
+            configure_appliance
+            start_ubuntu_on_next_boot /boot/
+            set_state "GET_CLOUD_PARAMS"
+            emit_done_signal
+            exit 1
+            ;;
+    esac
+}
+
 function set_state() {
     local state
 
@@ -526,54 +581,4 @@ function emit_done_signal() {
     fi
 }
 
-case "$(get_state)" in
-    "START")
-        create_upstart_config
-        create_resizing_initramfs_config
-        update_initramfs
-        set_state "RESIZED"
-        reboot
-        ;;
-    "RESIZED")
-        delete_resizing_initramfs_config
-        update_initramfs
-        download_xenserver_files
-        download_minvm_xva
-        create_ramdisk_contents
-        extract_xs_installer /root/xenserver.iso /opt/xs-install
-        generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
-        configure_grub
-        update_grub
-        set_xenserver_installer_as_nextboot
-        store_cloud_settings /xsinst/cloud-settings
-        store_authorized_keys /xsinst/authorized_keys
-        set_state "XAPIFIRSTBOOT"
-        ;;
-    "XAPIFIRSTBOOT")
-        wait_for_xapi
-        forget_networking
-        configure_appliance
-        add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
-        start_ubuntu_on_next_boot /boot/
-        set_state "GET_CLOUD_PARAMS"
-        emit_done_signal
-        exit 1
-        ;;
-    "GET_CLOUD_PARAMS")
-        mount_dom0_fs /mnt/dom0
-        wait_for_networking
-        store_cloud_settings /mnt/dom0/root/cloud-settings
-        store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
-        start_xenserver_on_next_boot /mnt/dom0/boot
-        set_state "XAPI"
-        ;;
-    "XAPI")
-        wait_for_xapi
-        forget_networking
-        configure_appliance
-        start_ubuntu_on_next_boot /boot/
-        set_state "GET_CLOUD_PARAMS"
-        emit_done_signal
-        exit 1
-        ;;
-esac
+main
