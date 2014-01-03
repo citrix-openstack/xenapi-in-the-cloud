@@ -18,18 +18,18 @@
 # limitations under the License.
 
 # 1.) Start an Ubuntu HVM instance in the Rackspace cloud
-# 2.) Copy this scipt to the location "$THIS_FILE"
-# 3.) Execute this script:
-#   - Without parameters to install only XenServer - dom0 accessible through
-#     the public IP
+# 2.) Copy this scipt to the instance's filesystem
+# 3.) Execute this script on the instance:
+#   - Without any parameters to install only XenServer - dom0 will be
+#     accessible through the public IP
 #   - With the parameter "minvm" to install an appliance, and access that
 #     through the public IP
-# 4.) Poll the public IP through ssh, and Wait until a file
+# 4.) Poll the public IP through ssh, and Wait until the file
 #     "$FILE_TO_TOUCH_ON_COMPLETION" exists
 
 set -eux
 
-THIS_FILE="/opt/nodepool-scripts/xenserver_cloud.sh"
+THIS_FILE="$(readlink -f $0)"
 INSTALL_DIR="$(dirname $THIS_FILE)"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
