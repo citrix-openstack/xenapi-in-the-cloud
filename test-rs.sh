@@ -12,13 +12,9 @@ function main() {
     prepare_for_snapshot
     wait_till_snapshottable
     perform_snapshot testvm testimage
-    ./kill-testvm.sh
-    rm -f kill-testvm.sh
     launch_vm snapvm testimage
     wait_till_done
-    ./kill-snapvm.sh
     nova image-delete testimage
-    rm -f kill-snapvm.sh
 
     echo "ALL TESTS PASSED"
 }
@@ -39,22 +35,12 @@ function launch_vm() {
     vm_name="$1"
     image_name="$2"
 
-    vm_killer_script="kill-$vm_name.sh"
     PRIVKEY="$vm_name.pem"
     privkey_name="tempkey-$vm_name"
 
-
-    if nova keypair-list | grep -q "$privkey_name"; then
-        echo "ERROR: A keypair already exists with the name $privkey_name"
-        exit 1
-    fi
-
-    cat > "$vm_killer_script" << EOF
-#!/bin/bash
-
-set -eux
-EOF
-    chmod +x "$vm_killer_script"
+    rm -f "$PRIVKEY" || true
+    nova keypair-delete "$privkey_name" || true
+    nova delete "$vm_name" --poll || true
 
     if nova list | grep -q "$vm_name"; then
         echo "ERROR: An instance already exists with the name $vm_name"
@@ -64,26 +50,17 @@ EOF
     nova keypair-add "$privkey_name" > "$PRIVKEY"
     chmod 0600 "$PRIVKEY"
 
-    cat >> "$vm_killer_script" << EOF
-nova keypair-delete "$privkey_name"
-rm -f "$PRIVKEY"
-EOF
-
     nova boot \
         --poll \
 	--image "$image_name" \
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
-while ! nova list | grep "$vm_name" | grep -q ACTIVE; do
-	sleep 5
-done
+    while ! nova list | grep "$vm_name" | grep -q ACTIVE; do
+            sleep 5
+    done
 
-vm_id=$(nova list | grep "$vm_name" | tr -d " " | cut -d "|" -f 2)
-
-    cat >> "$vm_killer_script" << EOF
-nova delete "$vm_id"
-EOF
+    vm_id=$(nova list | grep "$vm_name" | tr -d " " | cut -d "|" -f 2)
 
     while true; do
 	VM_IP=$(nova show $vm_id | grep accessIPv4 | tr -d " " | cut -d "|" -f 3)
