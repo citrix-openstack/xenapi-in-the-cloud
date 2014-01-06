@@ -40,12 +40,11 @@ function launch_vm() {
 
     rm -f "$PRIVKEY" || true
     nova keypair-delete "$privkey_name" || true
-    nova delete "$vm_name" --poll || true
+    nova delete "$vm_name" || true
 
-    if nova list | grep -q "$vm_name"; then
-        echo "ERROR: An instance already exists with the name $vm_name"
-        exit 1
-    fi
+    while nova list | grep -q "$vm_name"; do
+        sleep 1
+    done
 
     nova keypair-add "$privkey_name" > "$PRIVKEY"
     chmod 0600 "$PRIVKEY"
