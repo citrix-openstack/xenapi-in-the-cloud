@@ -11,6 +11,7 @@ function main() {
     wait_till_done
     prepare_for_snapshot
     wait_till_snapshottable
+    delete_all_images testimage
     perform_snapshot testvm testimage
     launch_vm snapvm testimage
     wait_till_done
@@ -132,6 +133,18 @@ function perform_snapshot() {
     snapshot_name="$2"
 
     nova image-create --poll "$vm_name" "$snapshot_name"
+}
+
+function delete_all_images() {
+    local image_name
+
+    nova image-list |
+        grep testimage |
+        sed -e 's/|//g' -e 's/ \+/ /g' -e 's/^ *//g' |
+        cut -d" " -f 1 |
+        while read imageid; do
+            nova image-delete $imageid
+        done
 }
 
 main
