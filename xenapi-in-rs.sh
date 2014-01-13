@@ -49,7 +49,7 @@ APPLIANCE_NAME="Appliance"
 
 XENSERVER_PASSWORD="xspassword"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
-STAGING_APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/minvm-dev.xva"
+STAGING_APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/master.xva"
 FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
 
 
