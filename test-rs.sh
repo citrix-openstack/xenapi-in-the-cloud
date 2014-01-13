@@ -6,7 +6,7 @@ SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 
 function main() {
-    launch_vm testvm "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)"
+    launch_vm testvm "Ubuntu 13.10 (Saucy Salamander)"
     start_install
     wait_till_done
     prepare_for_snapshot
@@ -53,6 +53,7 @@ function launch_vm() {
     nova boot \
         --poll \
 	--image "$image_name" \
+        --image-with vm_mode=hvm \
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
