@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# Note: RackSpace has hidden some of the images. Please see this page
+# http://www.rackspace.com/knowledge_center/article/hidden-base-images
+
 set -exu
 
 SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 
 function main() {
-    launch_vm testvm "Ubuntu 13.10 (Saucy Salamander)"
+    launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
     wait_till_done
     prepare_for_snapshot
