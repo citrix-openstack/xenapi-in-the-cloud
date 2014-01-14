@@ -1,6 +1,8 @@
 xenapi-in-the-cloud
 ===================
 
+[![Build Status](http://downloads.vmd.citrix.com/OpenStack/build-statuses/xenapi-in-the-cloud.png)]()
+
 Tools to run a XenAPI managed hypervisor in the cloud
 
 ## Start XenServer in the Rackspace cloud
