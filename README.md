@@ -9,13 +9,15 @@ To launch a XenServer in the Rackspace cloud, launch an instance with the
 following parameters:
 
  - flavor: `performance1-8`
- - image:  `Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)`
+ - image:  `62df001e-87ee-407c-b042-6f4e13f5d7e1`
+
+[Documentation, on why the image needs to be specified with a uuid.](http://www.rackspace.com/knowledge_center/article/hidden-base-images)
 
 Like this:
 
     nova boot \
         --poll \
-        --image "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)" \
+        --image "62df001e-87ee-407c-b042-6f4e13f5d7e1" \
         --flavor "performance1-8" \
         --key-name matekey instance
 
