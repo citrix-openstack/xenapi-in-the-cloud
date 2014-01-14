@@ -9,13 +9,15 @@ To launch a XenServer in the Rackspace cloud, launch an instance with the
 following parameters:
 
  - flavor: `performance1-8`
- - image:  `Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)`
+ - image:  `62df001e-87ee-407c-b042-6f4e13f5d7e1`
+
+[Documentation, on why the image needs to be specified with a uuid.](http://www.rackspace.com/knowledge_center/article/hidden-base-images)
 
 Like this:
 
     nova boot \
         --poll \
-        --image "Ubuntu 13.04 (Raring Ringtail) (PVHVM beta)" \
+        --image "62df001e-87ee-407c-b042-6f4e13f5d7e1" \
         --flavor "performance1-8" \
         --key-name matekey instance
 
@@ -27,9 +29,17 @@ Copy the `xenapi-in-rs.sh` script to `/root/`:
 
     scp xenapi-in-rs.sh root@$IP:/root/xenapi-in-rs.sh
 
-And execute that script:
+And execute that script with the following parameters:
 
-    ssh root@$IP bash /root/xenapi-in-rs.sh minvm
+    ssh root@$IP bash /root/xenapi-in-rs.sh XENSERVER_PASSWORD [APPLIANCE_URL]
+
+Where:
+ - `XENSERVER_PASSWORD` is a mandatory parameter, this will be the password
+ of your XenServer.
+ - `APPLIANCE_URL` is an optional parameter. It should be an url, specifying
+ an XVA file, that will be configured to listen on the public IP. The appliance
+ could be created with the help of [these scripts](
+ https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file:
 `/root/done.stamp`. Whenever you successfully logged in, and the file exists,
@@ -37,9 +47,11 @@ the transformation finished:
 
     ./wait-until-done.sh $IP matekey.priv
 
-A minimal precise VM will be listening on the public IP address. The XenServer
-will be accessible on the IP address: `192.168.33.2`. The password for the
-XenServer is `xspassword`.
+If you specified `APPLIANCE_URL`, that VM will be listening on the public IP
+address, the XenServer will be accessible on the IP address: `192.168.33.2`.
+
+If no appliance was given, you will be able to access dom0 through the public
+IP.
 
 Halt the instance before you snapshot it.
 
