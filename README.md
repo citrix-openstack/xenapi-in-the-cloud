@@ -27,9 +27,15 @@ Copy the `xenapi-in-rs.sh` script to `/root/`:
 
     scp xenapi-in-rs.sh root@$IP:/root/xenapi-in-rs.sh
 
-And execute that script:
+And execute that script with the following parameters:
 
-    ssh root@$IP bash /root/xenapi-in-rs.sh minvm
+    ssh root@$IP bash /root/xenapi-in-rs.sh XENSERVER_PASSWORD [APPLIANCE_URL]
+
+Where:
+ - `XENSERVER_PASSWORD` is a mandatory parameter, this will be the password
+ of your XenServer.
+ - `APPLIANCE_URL` is an optional parameter. It should be an url, specifying
+ an XVA file, that will be configured to listen on the public IP.
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file:
 `/root/done.stamp`. Whenever you successfully logged in, and the file exists,
@@ -37,9 +43,11 @@ the transformation finished:
 
     ./wait-until-done.sh $IP matekey.priv
 
-A minimal precise VM will be listening on the public IP address. The XenServer
-will be accessible on the IP address: `192.168.33.2`. The password for the
-XenServer is `xspassword`.
+If you specified `APPLIANCE_URL`, that VM will be listening on the public IP
+address, the XenServer will be accessible on the IP address: `192.168.33.2`.
+
+If no appliance was given, you will be able to access dom0 through the public
+IP.
 
 Halt the instance before you snapshot it.
 
