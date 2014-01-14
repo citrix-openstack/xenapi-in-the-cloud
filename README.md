@@ -28,7 +28,7 @@ After it's done, get the IP address of your instance:
     IP=$(./get-ip-address-of-instance.sh instance)
 
 Set up an environment variable to hold your ssh parameters (my private key is
-stored in the file `matekey.pem`:
+stored in the file `matekey.pem`):
 
     SSH_PARAMS="-i matekey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
