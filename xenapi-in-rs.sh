@@ -22,10 +22,13 @@
 # 1.) Start an Ubuntu HVM instance in the Rackspace cloud
 # 2.) Copy this scipt to the instance's filesystem
 # 3.) Execute this script on the instance:
-#   - Without any parameters to install only XenServer - dom0 will be
-#     accessible through the public IP
-#   - With the parameter "minvm" to install an appliance, and access that
-#     through the public IP
+#   - First parameter is the password for the XenServer
+#   - Second optional parameter is an appliance to install:
+#     - Without second parameter dom0 will be accessible through the public IP
+#     - With appliance URL given, that appliance will be accessible through
+#       the public IP. (Note, that the appliance has to be able to
+#       interact with xen). The XVA is generated using:
+#       https://github.com/citrix-openstack/openstack-xenapi-testing-xva
 # 4.) Poll the public IP through ssh, and Wait until the file
 #     "$FILE_TO_TOUCH_ON_COMPLETION" exists
 #
@@ -47,9 +50,9 @@ LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
 APPLIANCE_NAME="Appliance"
 
-XENSERVER_PASSWORD="xspassword"
+XENSERVER_PASSWORD="$1"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
-STAGING_APPLIANCE_URL="${1:-}"
+STAGING_APPLIANCE_URL="${2:-}"
 FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
 
 

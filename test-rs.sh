@@ -7,6 +7,7 @@ set -exu
 
 SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
+XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/master.xva"
 
 function main() {
@@ -85,7 +86,7 @@ SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
 function start_install() {
     $SSH -i $PRIVKEY root@$VM_IP mkdir -p $(dirname "$INSTALL_TARGET")
     $SCP -i $PRIVKEY $SCRIPT_TO_INSTALL "root@$VM_IP:$INSTALL_TARGET"
-    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" "$STAGING_VM_URL"
+    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" "$XENSERVER_PASSWORD" "$STAGING_VM_URL"
 }
 
 function wait_till_file_exists() {
