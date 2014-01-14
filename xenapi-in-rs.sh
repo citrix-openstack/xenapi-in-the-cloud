@@ -301,7 +301,7 @@ mkdir -p /mnt/ubuntu
 mount /dev/sda1 /mnt/ubuntu
 mkdir -p $(dirname $INSTALL_DIR)
 ln -s /mnt/ubuntu${INSTALL_DIR} $INSTALL_DIR || true
-if /bin/bash $THIS_FILE "$ADDITIONAL_PARAMETERS" >> $LOG_FILE 2>&1 ; then
+if /bin/bash $THIS_FILE $ADDITIONAL_PARAMETERS >> $LOG_FILE 2>&1 ; then
     reboot
 fi
 EOF
