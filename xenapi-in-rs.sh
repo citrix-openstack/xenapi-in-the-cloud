@@ -245,7 +245,7 @@ function download_xenserver_files() {
 }
 
 function download_minvm_xva() {
-    if [ -z "$STAGING_APPLIANCE_URL" ]; then
+    if [ -n "$STAGING_APPLIANCE_URL" ]; then
         wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
     fi
 }
