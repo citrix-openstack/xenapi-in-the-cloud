@@ -49,7 +49,7 @@ APPLIANCE_NAME="Appliance"
 
 XENSERVER_PASSWORD="xspassword"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
-STAGING_APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/master.xva"
+STAGING_APPLIANCE_URL="${1:-}"
 FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
 
 
@@ -245,7 +245,9 @@ function download_xenserver_files() {
 }
 
 function download_minvm_xva() {
-    wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
+    if [ -z "$STAGING_APPLIANCE_URL" ]; then
+        wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
+    fi
 }
 
 function print_answerfile() {
@@ -618,17 +620,17 @@ EOF
 }
 
 function configure_appliance() {
-    if [ -z "$ADDITIONAL_PARAMETERS" ]; then
+    if [ -z "$STAGING_APPLIANCE_URL" ]; then
         configure_dom0_to_cloud
-    elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
+    else
         configure_appliance_to_cloud
     fi
 }
 
 function emit_done_signal() {
-    if [ -z "$ADDITIONAL_PARAMETERS" ]; then
+    if [ -z "$STAGING_APPLIANCE_URL" ]; then
         create_done_file
-    elif [ "minvm" = "$ADDITIONAL_PARAMETERS" ]; then
+    else
         create_done_file_on_appliance
     fi
 }
