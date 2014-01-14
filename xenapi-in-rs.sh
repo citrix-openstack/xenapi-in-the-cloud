@@ -225,7 +225,7 @@ start on stopped rc RUNLEVEL=[2345]
 task
 
 script
-    /bin/bash $THIS_FILE "$ADDITIONAL_PARAMETERS" >> $LOG_FILE 2>&1
+    /bin/bash $THIS_FILE $ADDITIONAL_PARAMETERS >> $LOG_FILE 2>&1
     reboot
 end script
 EOF
