@@ -56,7 +56,6 @@ function launch_vm() {
     nova boot \
         --poll \
 	--image "$image_name" \
-        --image-with vm_mode=hvm \
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
