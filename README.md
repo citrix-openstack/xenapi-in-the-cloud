@@ -27,13 +27,28 @@ After it's done, get the IP address of your instance:
 
     IP=$(./get-ip-address-of-instance.sh instance)
 
-Copy the `xenapi-in-rs.sh` script to `/root/`:
+Set up an environment variable to hold your ssh parameters (my private key is
+stored in the file `matekey.pem`):
 
-    scp xenapi-in-rs.sh root@$IP:/root/xenapi-in-rs.sh
+    SSH_PARAMS="-i matekey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+Make a directory to hold the scripts:
+
+    ssh \
+        $SSH_PARAMS \
+        root@$IP mkdir -p /opt/xenapi-in-the-cloud
+
+Copy the `xenapi-in-rs.sh` script to that directory:
+
+    scp \
+        $SSH_PARAMS \
+        xenapi-in-rs.sh root@$IP:/opt/xenapi-in-the-cloud/
 
 And execute that script with the following parameters:
 
-    ssh root@$IP bash /root/xenapi-in-rs.sh XENSERVER_PASSWORD [APPLIANCE_URL]
+    ssh \
+        $SSH_PARAMS \
+        root@$IP bash /opt/xenapi-in-the-cloud/xenapi-in-rs.sh XENSERVER_PASSWORD [APPLIANCE_URL]
 
 Where:
  - `XENSERVER_PASSWORD` is a mandatory parameter, this will be the password
