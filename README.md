@@ -1,7 +1,7 @@
 xenapi-in-the-cloud
 ===================
 
-[![Build Status](http://downloads.vmd.citrix.com/OpenStack/build-statuses/xenapi-in-the-cloud.png)]()
+[![Build Status](http://downloads.vmd.citrix.com/OpenStack/build-statuses/xenapi-in-the-cloud.png?someparam)]()
 
 Tools to run a XenAPI managed hypervisor in the cloud
 
