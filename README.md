@@ -37,7 +37,9 @@ Where:
  - `XENSERVER_PASSWORD` is a mandatory parameter, this will be the password
  of your XenServer.
  - `APPLIANCE_URL` is an optional parameter. It should be an url, specifying
- an XVA file, that will be configured to listen on the public IP.
+ an XVA file, that will be configured to listen on the public IP. The appliance
+ could be created with the help of [these scripts](
+ https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file:
 `/root/done.stamp`. Whenever you successfully logged in, and the file exists,
