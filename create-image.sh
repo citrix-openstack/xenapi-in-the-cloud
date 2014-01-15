@@ -38,7 +38,7 @@ ssh \
 ssh \
     $SSH_PARAMS \
     -o ProxyCommand="ssh $SSH_PARAMS root@$IP nc %h %p -w 10 2> /dev/null" \
-    root@192.168.33.2 halt -p
+    root@192.168.33.2 "rm -f /root/done.stamp && halt -p"
 
 sleep 30
 
