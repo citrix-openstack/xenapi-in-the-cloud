@@ -7,6 +7,9 @@ APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-app
 KEY_NAME=matekey
 KEY_FILE=matekey.pem
 
+nova delete "$INSTANCE_NAME" || true
+nova image-delete "$SNAPSHOT_NAME" || true
+
 nova boot \
     --poll \
     --image "62df001e-87ee-407c-b042-6f4e13f5d7e1" \
