@@ -29,7 +29,7 @@ ssh \
     $SSH_PARAMS \
     root@$IP bash /opt/xenapi-in-the-cloud/xenapi-in-rs.sh $XENSERVER_PASSWORD $APPLIANCE_URL
 
-./wait-until-done.sh $IP matekey.priv
+./wait-until-done.sh $IP $KEY_FILE
 
 ssh \
     $SSH_PARAMS \
