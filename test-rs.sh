@@ -126,6 +126,7 @@ function prepare_for_snapshot() {
 # These instructions are executed on dom0
 # Prepare the box for snapshotting
 set -eux
+rm -f /root/done.stamp
 halt -p
 EOF
 }
