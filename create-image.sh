@@ -33,7 +33,7 @@ ssh \
 
 ssh \
     $SSH_PARAMS \
-    -o ProxyCommand="ssh $SSH_PARAMS nc %h %p 2> /dev/null" \
+    -o ProxyCommand="ssh $SSH_PARAMS nc %h %p -w 10 2> /dev/null" \
     root@192.168.33.2 halt -p
 
 sleep 30
