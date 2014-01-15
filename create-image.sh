@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eux
 
 INSTANCE_NAME="imgupdate"
 SNAPSHOT_NAME="xssnap"
