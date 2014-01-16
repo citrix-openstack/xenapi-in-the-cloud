@@ -26,12 +26,10 @@ function main() {
 }
 
 function wait_for_ssh() {
-    set +x
     while ! echo "kk" | nc -w 1 "$VM_IP" 22 > /dev/null 2>&1; do
             sleep 1
-            echo -n "."
+            echo -n "x"
     done
-    set -x
 }
 
 function launch_vm() {
@@ -76,7 +74,9 @@ function launch_vm() {
 	fi
     done
 
+    set +x
     wait_for_ssh
+    set -x
 }
 
 COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
