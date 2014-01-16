@@ -8,7 +8,7 @@ set -exu
 SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 XENSERVER_PASSWORD=xspassword
-STAGING_VM_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/master.xva"
+STAGING_VM_URL="$1"
 
 function main() {
     launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
@@ -26,12 +26,10 @@ function main() {
 }
 
 function wait_for_ssh() {
-    set +x
     while ! echo "kk" | nc -w 1 "$VM_IP" 22 > /dev/null 2>&1; do
             sleep 1
-            echo -n "."
+            echo -n "x"
     done
-    set -x
 }
 
 function launch_vm() {
@@ -76,7 +74,9 @@ function launch_vm() {
 	fi
     done
 
+    set +x
     wait_for_ssh
+    set -x
 }
 
 COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
