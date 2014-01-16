@@ -8,7 +8,7 @@ set -exu
 SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 XENSERVER_PASSWORD=xspassword
-STAGING_VM_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/master.xva"
+STAGING_VM_URL="$1"
 
 function main() {
     launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
