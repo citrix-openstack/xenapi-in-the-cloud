@@ -55,6 +55,7 @@ XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServ
 STAGING_APPLIANCE_URL="${2:-}"
 FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
 
+DOMZERO_USER=domzero
 
 function main() {
     case "$(get_state)" in
@@ -236,7 +237,7 @@ function create_done_file() {
 }
 
 function create_done_file_on_appliance() {
-    echo "touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance
+    echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance
 }
 
 function download_xenserver_files() {
@@ -511,7 +512,7 @@ function run_on_appliance() {
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
         -o BatchMode=yes \
-        "root@$vm_ip" "$@"
+        "$DOMZERO_USER@$vm_ip" "$@"
 }
 
 function configure_appliance_to_cloud() {
@@ -579,8 +580,8 @@ function configure_appliance_to_cloud() {
         DOMID=$(xe vm-param-get param-name=dom-id uuid=$VM)
 
         # Authenticate temporary key to appliance
-        xenstore-write /local/domain/$DOMID/authorized_keys/root "$(cat /root/dom0key.pub)"
-        xenstore-chmod -u /local/domain/$DOMID/authorized_keys/root r$DOMID
+        xenstore-write /local/domain/$DOMID/authorized_keys/$DOMZERO_USER "$(cat /root/dom0key.pub)"
+        xenstore-chmod -u /local/domain/$DOMID/authorized_keys/$DOMZERO_USER r$DOMID
 
         while ! run_on_appliance true < /dev/null > /dev/null 2>&1; do
             echo "waiting for key to be activated"
@@ -612,14 +613,12 @@ auto eth2
   address 192.168.33.1
   netmask 255.255.255.0
 EOF
-    } | run_on_appliance "tee /etc/network/interfaces"
+    } | run_on_appliance "sudo tee /etc/network/interfaces"
 
     # Update ssh keys and reboot, so settings applied
     {
-        echo "# The following key is used by dom0 to reconfigure this appliance"
-        cat /root/dom0key.pub
         cat /root/.ssh/authorized_keys
-    } | run_on_appliance "cat > /root/.ssh/authorized_keys && reboot"
+    } | run_on_appliance "sudo tee /root/.ssh/authorized_keys && sudo reboot"
 }
 
 function configure_appliance() {
