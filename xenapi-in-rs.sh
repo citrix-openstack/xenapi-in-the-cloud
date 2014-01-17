@@ -53,7 +53,7 @@ APPLIANCE_NAME="Appliance"
 XENSERVER_PASSWORD="$1"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
 STAGING_APPLIANCE_URL="${2:-}"
-FILE_TO_TOUCH_ON_COMPLETION="/root/done.stamp"
+FILE_TO_TOUCH_ON_COMPLETION="/var/run/xenserver.ready"
 
 DOMZERO_USER=domzero
 

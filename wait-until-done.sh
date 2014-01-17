@@ -1,11 +1,20 @@
 #!/bin/bash
 set -eu
 
-VM_IP="$1"
+REMOTE_SERVER="$1"
 PRIVKEY="$2"
 
 COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 SSH="ssh -q -o BatchMode=yes $COMMON_SSH_OPTIONS"
+
+
+if [ echo "$REMOTE_SERVER" | grep -q "@" ]; then
+    USERNAME=$(echo "$REMOTE_SERVER" | cut -d @ -f 1)
+    VM_IP=$(echo "$REMOTE_SERVER" | cut -d @ -f 2)
+else
+    USERNAME=root
+    VM_IP="$REMOTE_SERVER"
+fi
 
 function main() {
     wait_till_done
@@ -27,7 +36,7 @@ function wait_till_file_exists() {
 
     while true; do
         wait_for_ssh
-        if $SSH -i $PRIVKEY root@$VM_IP test -e $fname; then
+        if $SSH -i $PRIVKEY $USERNAME@$VM_IP test -e $fname; then
             break
         else
             echo -n "."

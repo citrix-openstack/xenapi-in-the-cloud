@@ -9,6 +9,7 @@ SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="$1"
+STAMP_FILE="/var/run/xenserver.ready"
 
 function main() {
     launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
@@ -111,7 +112,7 @@ function wait_till_file_exists() {
 }
 
 function wait_till_done() {
-    wait_till_file_exists /root/done.stamp
+    wait_till_file_exists $STAMP_FILE
 }
 
 function wait_till_snapshottable() {
@@ -126,7 +127,7 @@ function prepare_for_snapshot() {
 # These instructions are executed on dom0
 # Prepare the box for snapshotting
 set -eux
-rm -f /root/done.stamp
+rm -f $STAMP_FILE
 halt -p
 EOF
 }

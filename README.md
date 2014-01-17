@@ -59,7 +59,7 @@ Where:
  https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file:
-`/root/done.stamp`. Whenever you successfully logged in, and the file exists,
+`/var/run/xenserver.ready`. Whenever you successfully logged in, and the file exists,
 the transformation finished:
 
     ./wait-until-done.sh $IP matekey.priv
