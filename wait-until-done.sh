@@ -20,10 +20,18 @@ function main() {
     wait_till_done
 }
 
+function print_dot() {
+    if [ -z "${BUILD_NUMBER:-}" ]; then
+        echo -n "."
+    else
+        echo "."
+    fi
+}
+
 function wait_for_ssh() {
     while ! echo "kk" | nc -w 1 "$VM_IP" 22 > /dev/null 2>&1; do
             sleep 1
-            echo -n "."
+            print_dot
     done
 }
 
@@ -39,7 +47,7 @@ function wait_till_file_exists() {
         if $SSH -i $PRIVKEY $USERNAME@$VM_IP test -e $fname; then
             break
         else
-            echo -n "."
+            print_dot
             sleep 10
         fi
     done
