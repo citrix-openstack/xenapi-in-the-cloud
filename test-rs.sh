@@ -13,13 +13,13 @@ STAGING_VM_URL="$1"
 function main() {
     launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
-    ./wait-until-done.sh testvm $PRIVKEY
+    ./wait-until-done.sh $VM_IP $PRIVKEY
     prepare_for_snapshot
     wait_till_snapshottable
     delete_all_images testimage
     perform_snapshot testvm testimage
     launch_vm snapvm testimage
-    ./wait-until-done.sh snapvm $PRIVKEY
+    ./wait-until-done.sh $VM_IP $PRIVKEY
     nova image-delete testimage
 
     echo "ALL TESTS PASSED"
