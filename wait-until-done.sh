@@ -17,7 +17,21 @@ else
 fi
 
 function main() {
-    wait_till_done
+    local stamp_file
+
+    stamp_file=$(./print-stamp-path.sh)
+
+    cat << EOF
+Waiting for stamp file [$stamp_file]
+    ADDRESS : $VM_IP
+    USERNAME: $USERNAME
+
+ X - failed to connect to port 22
+ . - stamp file did not exist
+EOF
+
+    wait_till_file_exists $(./print-stamp-path.sh)
+    echo "Found!"
 }
 
 function print_dot_and_sleep() {
@@ -44,7 +58,6 @@ function wait_till_file_exists() {
 
     fname="$1"
 
-    echo -n "Waiting for $fname"
 
     while true; do
         wait_for_ssh
@@ -54,11 +67,6 @@ function wait_till_file_exists() {
             print_dot_and_sleep .
         fi
     done
-    echo "Found!"
-}
-
-function wait_till_done() {
-    wait_till_file_exists $(./print-stamp-path.sh)
 }
 
 main
