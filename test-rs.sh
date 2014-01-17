@@ -14,13 +14,13 @@ STAMP_FILE="/var/run/xenserver.ready"
 function main() {
     launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
-    wait_till_done
+    ./wait-until-done.sh testvm
     prepare_for_snapshot
     wait_till_snapshottable
     delete_all_images testimage
     perform_snapshot testvm testimage
     launch_vm snapvm testimage
-    wait_till_done
+    ./wait-until-done.sh testvm
     nova image-delete testimage
 
     echo "ALL TESTS PASSED"
@@ -60,20 +60,7 @@ function launch_vm() {
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
-    while ! nova list | grep "$vm_name" | grep -q ACTIVE; do
-            sleep 5
-    done
-
-    vm_id=$(nova list | grep "$vm_name" | tr -d " " | cut -d "|" -f 2)
-
-    while true; do
-	VM_IP=$(nova show $vm_id | grep accessIPv4 | tr -d " " | cut -d "|" -f 3)
-	if [ -z "$VM_IP" ]; then
-		sleep 1
-	else
-		break
-	fi
-    done
+    VM_IP=$(./get-ip-address-of-instance.sh $vm_name)
 
     set +x
     wait_for_ssh
@@ -90,31 +77,6 @@ function start_install() {
     $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" "$XENSERVER_PASSWORD" "$STAGING_VM_URL"
 }
 
-function wait_till_file_exists() {
-    set +x
-    local fname
-
-    fname="$1"
-
-    echo -n "Waiting for $fname"
-
-    while true; do
-        wait_for_ssh
-        if $SSH -i $PRIVKEY root@$VM_IP test -e $fname; then
-            break
-        else
-            echo -n "."
-            sleep 10
-        fi
-    done
-    echo "Found!"
-    set -x
-}
-
-function wait_till_done() {
-    wait_till_file_exists $STAMP_FILE
-}
-
 function wait_till_snapshottable() {
     sleep 20
 }
@@ -123,11 +85,10 @@ function prepare_for_snapshot() {
     # Copy over ssh key
     $SCP -i $PRIVKEY $PRIVKEY root@$VM_IP:key
     $SSH -i $PRIVKEY root@$VM_IP "chmod 0600 key"
+    $SSH -i $PRIVKEY root@$VM_IP "rm -f $STAMP_FILE"
     $SSH -i $PRIVKEY root@$VM_IP "$SSH -i key root@192.168.33.2" << EOF
 # These instructions are executed on dom0
-# Prepare the box for snapshotting
 set -eux
-rm -f $STAMP_FILE
 halt -p
 EOF
 }
