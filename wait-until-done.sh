@@ -8,7 +8,7 @@ COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 SSH="ssh -q -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
 
-if [ echo "$REMOTE_SERVER" | grep -q "@" ]; then
+if echo "$REMOTE_SERVER" | grep -q "@"; then
     USERNAME=$(echo "$REMOTE_SERVER" | cut -d @ -f 1)
     VM_IP=$(echo "$REMOTE_SERVER" | cut -d @ -f 2)
 else
