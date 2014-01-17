@@ -237,7 +237,9 @@ function create_done_file() {
 }
 
 function create_done_file_on_appliance() {
-    echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance
+    while ! echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance; do
+        sleep 1
+    done
 }
 
 function download_xenserver_files() {
