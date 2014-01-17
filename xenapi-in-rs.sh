@@ -237,7 +237,7 @@ function create_done_file() {
 }
 
 function create_done_file_on_appliance() {
-    while ! run_on_appliance "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" </dev/null; do
+    while ! echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance; do
         sleep 1
     done
 }
