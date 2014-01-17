@@ -7,7 +7,6 @@ XENSERVER_PASSWORD="password"
 APPLIANCE_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/master.xva"
 KEY_NAME=matekey
 KEY_FILE=matekey.pem
-STAMP_FILE="/var/run/xenserver.ready"
 
 nova delete "$INSTANCE_NAME" || true
 nova image-delete "$SNAPSHOT_NAME" || true
@@ -38,7 +37,7 @@ ssh \
 
 ssh \
     $SSH_PARAMS \
-    root@$IP rm -f $STAMP_FILE
+    root@$IP rm -f $(./print-stamp-path.sh)
 
 ssh \
     $SSH_PARAMS \

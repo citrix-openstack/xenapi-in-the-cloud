@@ -9,7 +9,6 @@ SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="$1"
-STAMP_FILE="/var/run/xenserver.ready"
 
 function main() {
     launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
@@ -85,7 +84,7 @@ function prepare_for_snapshot() {
     # Copy over ssh key
     $SCP -i $PRIVKEY $PRIVKEY root@$VM_IP:key
     $SSH -i $PRIVKEY root@$VM_IP "chmod 0600 key"
-    $SSH -i $PRIVKEY root@$VM_IP "rm -f $STAMP_FILE"
+    $SSH -i $PRIVKEY root@$VM_IP "rm -f $(./print-stamp-path.sh)"
     $SSH -i $PRIVKEY root@$VM_IP "$SSH -i key root@192.168.33.2" << EOF
 # These instructions are executed on dom0
 set -eux
