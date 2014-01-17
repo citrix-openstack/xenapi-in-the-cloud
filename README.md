@@ -58,9 +58,9 @@ Where:
  could be created with the help of [these scripts](
  https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
 
-Now, you have to monitor the public IP with ssh, and look for a stamp file:
-`/root/done.stamp`. Whenever you successfully logged in, and the file exists,
-the transformation finished:
+Now, you have to monitor the public IP with ssh, and look for a stamp file. To
+get the name of the stamp file, execute `./print-stamp-path.sh`. Whenever you
+successfully logged in, and the file exists, the transformation finished:
 
     ./wait-until-done.sh $IP matekey.priv
 

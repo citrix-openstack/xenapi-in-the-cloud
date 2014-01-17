@@ -1,20 +1,55 @@
 #!/bin/bash
 set -eu
 
-VM_IP="$1"
+REMOTE_SERVER="$1"
 PRIVKEY="$2"
 
 COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 SSH="ssh -q -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
+
+if echo "$REMOTE_SERVER" | grep -q "@"; then
+    USERNAME=$(echo "$REMOTE_SERVER" | cut -d @ -f 1)
+    VM_IP=$(echo "$REMOTE_SERVER" | cut -d @ -f 2)
+else
+    USERNAME=root
+    VM_IP="$REMOTE_SERVER"
+fi
+
 function main() {
-    wait_till_done
+    local stamp_file
+
+    stamp_file=$(./print-stamp-path.sh)
+
+    cat << EOF
+Waiting for stamp file [$stamp_file]
+    ADDRESS : $VM_IP
+    USERNAME: $USERNAME
+
+ X - failed to connect to port 22
+ . - stamp file did not exist
+EOF
+
+    wait_till_file_exists $(./print-stamp-path.sh)
+    echo "Found!"
+}
+
+function print_dot_and_sleep() {
+    local dot_type
+
+    dot_type="$1"
+
+    if [ -z "${BUILD_NUMBER:-}" ]; then
+        echo -n "$dot_type"
+    else
+        echo "$dot_type"
+    fi
+    sleep 10
 }
 
 function wait_for_ssh() {
     while ! echo "kk" | nc -w 1 "$VM_IP" 22 > /dev/null 2>&1; do
-            sleep 1
-            echo -n "."
+            print_dot_and_sleep X
     done
 }
 
@@ -23,22 +58,15 @@ function wait_till_file_exists() {
 
     fname="$1"
 
-    echo -n "Waiting for $fname"
 
     while true; do
         wait_for_ssh
-        if $SSH -i $PRIVKEY root@$VM_IP test -e $fname; then
+        if $SSH -i $PRIVKEY $USERNAME@$VM_IP test -e $fname; then
             break
         else
-            echo -n "."
-            sleep 10
+            print_dot_and_sleep .
         fi
     done
-    echo "Found!"
-}
-
-function wait_till_done() {
-    wait_till_file_exists /root/done.stamp
 }
 
 main

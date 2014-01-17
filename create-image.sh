@@ -37,7 +37,7 @@ ssh \
 
 ssh \
     $SSH_PARAMS \
-    root@$IP rm -f /root/done.stamp
+    root@$IP rm -f $(./print-stamp-path.sh)
 
 ssh \
     $SSH_PARAMS \
