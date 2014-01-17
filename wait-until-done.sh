@@ -6,6 +6,7 @@ PRIVKEY="$2"
 
 COMMON_SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 SSH="ssh -q -o BatchMode=yes $COMMON_SSH_OPTIONS"
+STAMP_FILE="/var/run/xenserver.ready"
 
 
 if [ echo "$REMOTE_SERVER" | grep -q "@" ]; then
@@ -47,7 +48,7 @@ function wait_till_file_exists() {
 }
 
 function wait_till_done() {
-    wait_till_file_exists /root/done.stamp
+    wait_till_file_exists $STAMP_FILE
 }
 
 main
