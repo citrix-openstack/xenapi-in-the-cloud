@@ -539,6 +539,11 @@ function configure_appliance_to_cloud() {
     fi
     DNS_ADDRESSES=$(echo "$NAMESERVERS" | sed -e "s/,/ /g")
 
+    VMNET=$(xe network-list name-label=vmnet --minimal)
+    if [ -z "$VMNET" ]; then
+        VMNET=$(xe network-create name-label=vmnet)
+    fi
+
     xe pif-reconfigure-ip \
         uuid=$PIF \
         mode=static \
@@ -566,6 +571,7 @@ function configure_appliance_to_cloud() {
     xe vif-create vm-uuid=$VM network-uuid=$HOST_INT_NET device=0
     xe vif-create vm-uuid=$VM network-uuid=$ORIGINAL_MGT_NET mac=$MACADDRESS device=1
     xe vif-create vm-uuid=$VM network-uuid=$NEW_MGT_NET device=2
+    xe vif-create vm-uuid=$VM network-uuid=$VMNET device=3
 
     xe vm-start uuid=$VM
 
