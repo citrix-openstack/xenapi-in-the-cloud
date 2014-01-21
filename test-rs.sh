@@ -20,6 +20,7 @@ function main() {
     perform_snapshot testvm testimage
     launch_vm snapvm testimage
     ./wait-until-done.sh $VM_IP $PRIVKEY
+    test_ssh_access_to_dom0
     nova image-delete testimage
 
     echo "ALL TESTS PASSED"
@@ -112,6 +113,19 @@ function delete_all_images() {
         while read imageid; do
             nova image-delete $imageid
         done
+}
+
+function test_ssh_access_to_dom0() {
+    local vm_ip
+    local privkey_path
+
+    vm_ip="$VM_IP"
+    privkey_path="$PRIVKEY"
+
+    $SSH -i $PRIVKEY root@$VM_IP bash << EOF
+set -eux
+sudo -u domzero ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.33.2 true
+EOF
 }
 
 main
