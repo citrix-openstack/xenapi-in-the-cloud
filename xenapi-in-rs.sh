@@ -620,13 +620,17 @@ auto eth2
 EOF
     } | run_on_appliance "sudo tee /etc/network/interfaces"
 
+    tmpdomzerokey=$(mktemp)
+
+    # Enable domzero user to log in to dom0
+    run_on_appliance cat /home/domzero/.ssh/id_rsa.pub > $tmpdomzerokey
+
     # Update ssh keys and reboot, so settings applied
     {
         cat /root/.ssh/authorized_keys
     } | run_on_appliance "sudo tee /root/.ssh/authorized_keys && sudo reboot"
 
-    # Enable domzero user to log in to dom0
-    run_on_appliance cat /home/domzero/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys
+    cat $tmpdomzerokey >> /root/.ssh/authorized_keys
 }
 
 function configure_appliance() {
