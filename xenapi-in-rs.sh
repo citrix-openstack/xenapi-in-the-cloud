@@ -598,6 +598,9 @@ function configure_appliance_to_cloud() {
 
         # Remove authorized_keys updater
         echo "" | run_on_appliance crontab -
+
+        # Create an ssh key for domzero user
+        echo 'ssh-keygen -f /home/domzero/.ssh/id_rsa -C domzero@appliance -N "" -q' | run_on_appliance
     fi
 
     # Update network configuration
@@ -627,6 +630,9 @@ EOF
     {
         cat /root/.ssh/authorized_keys
     } | run_on_appliance "sudo tee /root/.ssh/authorized_keys && sudo reboot"
+
+    # Enable domzero user to log in to dom0
+    run_on_appliance cat /home/domzero/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys
 }
 
 function configure_appliance() {
