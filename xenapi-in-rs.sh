@@ -97,9 +97,9 @@ function main() {
             store_cloud_settings /mnt/dom0/root/cloud-settings
             store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
             start_xenserver_on_next_boot /mnt/dom0/boot
-            set_state "XAPI"
+            set_state "XENSERVER"
             ;;
-        "XAPI")
+        "XENSERVER")
             wait_for_xapi
             forget_networking
             configure_appliance
