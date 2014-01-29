@@ -636,6 +636,7 @@ function configure_appliance() {
     else
         configure_appliance_to_cloud
     fi
+    /opt/xensource/libexec/interface-reconfigure rewrite
 }
 
 function emit_done_signal() {
