@@ -63,10 +63,10 @@ function main() {
             create_upstart_config
             create_resizing_initramfs_config
             update_initramfs
-            set_state "RESIZED"
+            set_state "SETUP_INSTALLER"
             reboot
             ;;
-        "RESIZED")
+        "SETUP_INSTALLER")
             delete_resizing_initramfs_config
             update_initramfs
             download_xenserver_files /root/xenserver.iso
