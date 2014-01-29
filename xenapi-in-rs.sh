@@ -80,6 +80,7 @@ function main() {
             store_cloud_settings /xsinst/cloud-settings
             store_authorized_keys /xsinst/authorized_keys
             set_state "XENSERVER_FIRSTBOOT"
+            reboot
             ;;
         "XENSERVER_FIRSTBOOT")
             wait_for_xapi
@@ -89,7 +90,6 @@ function main() {
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
             emit_done_signal
-            exit 1
             ;;
         "UBUNTU")
             mount_dom0_fs /mnt/dom0
@@ -98,6 +98,7 @@ function main() {
             store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
             start_xenserver_on_next_boot /mnt/dom0/boot
             set_state "XENSERVER"
+            reboot
             ;;
         "XENSERVER")
             wait_for_xapi
@@ -106,7 +107,6 @@ function main() {
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
             emit_done_signal
-            exit 1
             ;;
     esac
 }
@@ -227,7 +227,6 @@ task
 
 script
     /bin/bash $THIS_FILE $ADDITIONAL_PARAMETERS >> $LOG_FILE 2>&1
-    reboot
 end script
 EOF
 }
@@ -304,9 +303,7 @@ mkdir -p /mnt/ubuntu
 mount /dev/sda1 /mnt/ubuntu
 mkdir -p $(dirname $INSTALL_DIR)
 [ -L $INSTALL_DIR ] || ln -s /mnt/ubuntu${INSTALL_DIR} $INSTALL_DIR
-if /bin/bash $THIS_FILE $ADDITIONAL_PARAMETERS >> $LOG_FILE 2>&1 ; then
-    reboot
-fi
+/bin/bash $THIS_FILE $ADDITIONAL_PARAMETERS >> $LOG_FILE 2>&1
 EOF
 }
 
