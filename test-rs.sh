@@ -24,6 +24,8 @@ function main() {
     ./wait-until-done.sh $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
     nova image-delete testimage
+    nova delete $TESTVM_NAME
+    nova delete $SNAPVM_NAME
 
     echo "ALL TESTS PASSED"
 }
