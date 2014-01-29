@@ -15,7 +15,6 @@ function main() {
     start_install
     ./wait-until-done.sh $VM_IP $PRIVKEY
     prepare_for_snapshot
-    wait_till_snapshottable
     delete_all_images testimage
     perform_snapshot testvm testimage
     launch_vm snapvm testimage
@@ -77,20 +76,9 @@ function start_install() {
     $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" "$XENSERVER_PASSWORD" "$STAGING_VM_URL"
 }
 
-function wait_till_snapshottable() {
-    sleep 20
-}
-
 function prepare_for_snapshot() {
-    # Copy over ssh key
-    $SCP -i $PRIVKEY $PRIVKEY root@$VM_IP:key
-    $SSH -i $PRIVKEY root@$VM_IP "chmod 0600 key"
     $SSH -i $PRIVKEY root@$VM_IP "rm -f $(./print-stamp-path.sh)"
-    $SSH -i $PRIVKEY root@$VM_IP "$SSH -i key root@192.168.33.2" << EOF
-# These instructions are executed on dom0
-set -eux
-halt -p
-EOF
+    $SSH -i $PRIVKEY root@$VM_IP "sync && sleep 5"
 }
 
 function perform_snapshot() {
