@@ -77,6 +77,13 @@ function start_install() {
 }
 
 function prepare_for_snapshot() {
+    # Copy over ssh key
+    $SCP -i $PRIVKEY $PRIVKEY root@$VM_IP:key
+    $SSH -i $PRIVKEY root@$VM_IP "chmod 0600 key"
+    $SSH -i $PRIVKEY root@$VM_IP "$SSH -i key root@192.168.33.2" << EOF
+/opt/xensource/libexec/interface-reconfigure rewrite
+EOF
+
     $SSH -i $PRIVKEY root@$VM_IP "rm -f $(./print-stamp-path.sh)"
     $SSH -i $PRIVKEY root@$VM_IP "sync && sleep 5"
 }
