@@ -79,9 +79,9 @@ function main() {
             set_xenserver_installer_as_nextboot
             store_cloud_settings /xsinst/cloud-settings
             store_authorized_keys /xsinst/authorized_keys
-            set_state "XAPIFIRSTBOOT"
+            set_state "XENSERVER_FIRSTBOOT"
             ;;
-        "XAPIFIRSTBOOT")
+        "XENSERVER_FIRSTBOOT")
             wait_for_xapi
             forget_networking
             configure_appliance
