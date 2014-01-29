@@ -87,11 +87,11 @@ function main() {
             configure_appliance
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
-            set_state "GET_CLOUD_PARAMS"
+            set_state "UBUNTU"
             emit_done_signal
             exit 1
             ;;
-        "GET_CLOUD_PARAMS")
+        "UBUNTU")
             mount_dom0_fs /mnt/dom0
             wait_for_networking
             store_cloud_settings /mnt/dom0/root/cloud-settings
@@ -104,7 +104,7 @@ function main() {
             forget_networking
             configure_appliance
             start_ubuntu_on_next_boot /boot/
-            set_state "GET_CLOUD_PARAMS"
+            set_state "UBUNTU"
             emit_done_signal
             exit 1
             ;;
