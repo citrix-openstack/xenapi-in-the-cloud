@@ -80,7 +80,7 @@ the settings. For setting up your environment and nova, please refer to
 
 After these steps, run:
 
-    ./test-rs.sh
+    ./test-rs.sh STAGING_VM VM_POSTFIX
 
 Investigate the return code and its output. `0` return code indicates that the
 setup script works, and the instance could be used in a cloud environment,
