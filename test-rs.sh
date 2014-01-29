@@ -12,18 +12,19 @@ STAGING_VM_URL="$1"
 TEST_POSTFIX="$2"
 TESTVM_NAME="Jxict${TEST_POSTFIX}"
 SNAPVM_NAME="Jxics${TEST_POSTFIX}"
+IMAGE_NAME="Jxici${TEST_POSTFIX}"
 
 function main() {
     launch_vm $TESTVM_NAME "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
     ./wait-until-done.sh $VM_IP $PRIVKEY
     prepare_for_snapshot
-    delete_all_images testimage
-    perform_snapshot $TESTVM_NAME testimage
-    launch_vm $SNAPVM_NAME testimage
+    delete_all_images $IMAGE_NAME
+    perform_snapshot $TESTVM_NAME $IMAGE_NAME
+    launch_vm $SNAPVM_NAME $IMAGE_NAME
     ./wait-until-done.sh $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
-    nova image-delete testimage
+    nova image-delete $IMAGE_NAME
     nova delete $TESTVM_NAME
     nova delete $SNAPVM_NAME
 
@@ -100,7 +101,7 @@ function delete_all_images() {
     local image_name
 
     nova image-list |
-        grep testimage |
+        grep $IMAGE_NAME |
         sed -e 's/|//g' -e 's/ \+/ /g' -e 's/^ *//g' |
         cut -d" " -f 1 |
         while read imageid; do
