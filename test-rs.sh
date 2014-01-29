@@ -9,15 +9,18 @@ SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="$1"
+TEST_POSTFIX="$2"
+TESTVM_NAME="Jxict${TEST_POSTFIX}"
+SNAPVM_NAME="Jxics${TEST_POSTFIX}"
 
 function main() {
-    launch_vm testvm "62df001e-87ee-407c-b042-6f4e13f5d7e1"
+    launch_vm $TESTVM_NAME "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
     ./wait-until-done.sh $VM_IP $PRIVKEY
     prepare_for_snapshot
     delete_all_images testimage
-    perform_snapshot testvm testimage
-    launch_vm snapvm testimage
+    perform_snapshot $TESTVM_NAME testimage
+    launch_vm $SNAPVM_NAME testimage
     ./wait-until-done.sh $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
     nova image-delete testimage
