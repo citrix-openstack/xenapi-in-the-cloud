@@ -63,10 +63,10 @@ function main() {
             create_upstart_config
             create_resizing_initramfs_config
             update_initramfs
-            set_state "RESIZED"
+            set_state "SETUP_INSTALLER"
             reboot
             ;;
-        "RESIZED")
+        "SETUP_INSTALLER")
             delete_resizing_initramfs_config
             update_initramfs
             download_xenserver_files /root/xenserver.iso
@@ -79,32 +79,32 @@ function main() {
             set_xenserver_installer_as_nextboot
             store_cloud_settings /xsinst/cloud-settings
             store_authorized_keys /xsinst/authorized_keys
-            set_state "XAPIFIRSTBOOT"
+            set_state "XENSERVER_FIRSTBOOT"
             ;;
-        "XAPIFIRSTBOOT")
+        "XENSERVER_FIRSTBOOT")
             wait_for_xapi
             forget_networking
             configure_appliance
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
-            set_state "GET_CLOUD_PARAMS"
+            set_state "UBUNTU"
             emit_done_signal
             exit 1
             ;;
-        "GET_CLOUD_PARAMS")
+        "UBUNTU")
             mount_dom0_fs /mnt/dom0
             wait_for_networking
             store_cloud_settings /mnt/dom0/root/cloud-settings
             store_authorized_keys /mnt/dom0/root/.ssh/authorized_keys
             start_xenserver_on_next_boot /mnt/dom0/boot
-            set_state "XAPI"
+            set_state "XENSERVER"
             ;;
-        "XAPI")
+        "XENSERVER")
             wait_for_xapi
             forget_networking
             configure_appliance
             start_ubuntu_on_next_boot /boot/
-            set_state "GET_CLOUD_PARAMS"
+            set_state "UBUNTU"
             emit_done_signal
             exit 1
             ;;
