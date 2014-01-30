@@ -1,5 +1,4 @@
-xenapi-in-the-cloud
-===================
+# xenapi-in-the-cloud
 
 [![Build Status](http://downloads.vmd.citrix.com/OpenStack/build-statuses/xenapi-in-the-cloud.png?someparam)]()
 
@@ -70,8 +69,6 @@ address, the XenServer will be accessible on the IP address: `192.168.33.2`.
 If no appliance was given, you will be able to access dom0 through the public
 IP.
 
-Halt the instance before you snapshot it.
-
 ## Testing
 
 Make sure, that you have `nova` installed, and that your environment has all
@@ -80,11 +77,10 @@ the settings. For setting up your environment and nova, please refer to
 
 After these steps, run:
 
-    ./test-rs.sh STAGING_VM VM_POSTFIX
+    ./test-rs.sh $STAGING_VM_URL $VM_POSTFIX
 
 Investigate the return code and its output. `0` return code indicates that the
-setup script works, and the instance could be used in a cloud environment,
-assuming proper use (halt before snapshot)
+setup script works, and the instance could be used in a cloud environment.
 
 ## How Does it Work?
 
