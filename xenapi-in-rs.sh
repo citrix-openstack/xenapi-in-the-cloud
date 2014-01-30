@@ -36,9 +36,8 @@
 # Snapshots
 # ~~~~~~~~~
 # 1.) Delete "$FILE_TO_TOUCH_ON_COMPLETION"
-# 2.) Shut down the instance
-# 3.) Create snapshot
-# 4.) When booting instances from the snapshot, poll
+# 2.) Create snapshot
+# 3.) When booting instances from the snapshot, poll
 #     "$FILE_TO_TOUCH_ON_COMPLETION"
 
 set -eux
@@ -60,7 +59,7 @@ DOMZERO_USER=domzero
 function main() {
     case "$(get_state)" in
         "START")
-            create_upstart_config
+            run_this_script_on_each_boot
             create_resizing_initramfs_config
             update_initramfs
             set_state "SETUP_INSTALLER"
@@ -70,7 +69,7 @@ function main() {
             delete_resizing_initramfs_config
             update_initramfs
             download_xenserver_files /root/xenserver.iso
-            download_minvm_xva
+            download_appliance
             create_ramdisk_contents /root/xenserver.iso /xsinst
             extract_xs_installer /root/xenserver.iso /opt/xs-install
             generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
@@ -219,7 +218,7 @@ function update_initramfs() {
     update-initramfs -u
 }
 
-function create_upstart_config() {
+function run_this_script_on_each_boot() {
     cat > /etc/init/xenserver.conf << EOF
 start on stopped rc RUNLEVEL=[2345]
 
@@ -249,7 +248,7 @@ function download_xenserver_files() {
     wget -qO "$tgt" "$XENSERVER_ISO_URL"
 }
 
-function download_minvm_xva() {
+function download_appliance() {
     if [ -n "$STAGING_APPLIANCE_URL" ]; then
         wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
     fi
