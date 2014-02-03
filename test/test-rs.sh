@@ -8,6 +8,7 @@ set -exu
 THIS_DIR=$(dirname $(readlink -f $0))
 BIN_DIR="$THIS_DIR/../bin"
 SCRIPTS_DIR="$THIS_DIR/../scripts"
+export PATH=$PATH:$BIN_DIR
 
 SCRIPTS_TO_INSTALL="$SCRIPTS_DIR/*"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
@@ -21,12 +22,12 @@ IMAGE_NAME="Jxici${TEST_POSTFIX}"
 function main() {
     launch_vm $TESTVM_NAME "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
-    $BIN_DIR/wait-until-done.sh $VM_IP $PRIVKEY
+    wait-until-done.sh $VM_IP $PRIVKEY
     prepare_for_snapshot
     delete_all_images $IMAGE_NAME
     perform_snapshot $TESTVM_NAME $IMAGE_NAME
     launch_vm $SNAPVM_NAME $IMAGE_NAME
-    $BIN_DIR/wait-until-done.sh $VM_IP $PRIVKEY
+    wait-until-done.sh $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
     nova image-delete $IMAGE_NAME
     nova delete $TESTVM_NAME
@@ -69,7 +70,7 @@ function launch_vm() {
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
-    VM_IP=$($BIN_DIR/get-ip-address-of-instance.sh $vm_name)
+    VM_IP=$(get-ip-address-of-instance.sh $vm_name)
 
     set +x
     wait_for_ssh
@@ -87,7 +88,7 @@ function start_install() {
 }
 
 function prepare_for_snapshot() {
-    $SSH -i $PRIVKEY root@$VM_IP "rm -f $($BIN_DIR/print-stamp-path.sh)"
+    $SSH -i $PRIVKEY root@$VM_IP "rm -f $(print-stamp-path.sh)"
     $SSH -i $PRIVKEY root@$VM_IP "sync && sleep 5"
 }
 
