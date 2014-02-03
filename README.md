@@ -24,7 +24,7 @@ Like this:
 
 After it's done, get the IP address of your instance:
 
-    IP=$(get-ip-address-of-instance.sh instance)
+    IP=$(xitc-get-ip-address-of-instance instance)
 
 Set up an environment variable to hold your ssh parameters (my private key is
 stored in the file `matekey.pem`):
@@ -58,10 +58,10 @@ Where:
  https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file. To
-get the name of the stamp file, execute `print-stamp-path.sh`. Whenever you
+get the name of the stamp file, execute `xitc-print-stamp-path`. Whenever you
 successfully logged in, and the file exists, the transformation finished:
 
-    wait-until-done.sh $IP matekey.priv
+    xitc-wait-until-done $IP matekey.priv
 
 If you specified `APPLIANCE_URL`, that VM will be listening on the public IP
 address, the XenServer will be accessible on the IP address: `192.168.33.2`.
