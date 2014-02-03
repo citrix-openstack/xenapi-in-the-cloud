@@ -19,7 +19,7 @@ fi
 function main() {
     local stamp_file
 
-    stamp_file=$(./print-stamp-path.sh)
+    stamp_file=$(xitc-print-stamp-path)
 
     cat << EOF
 Waiting for stamp file [$stamp_file]
@@ -30,7 +30,7 @@ Waiting for stamp file [$stamp_file]
  . - stamp file did not exist
 EOF
 
-    wait_till_file_exists $(./print-stamp-path.sh)
+    wait_till_file_exists $(xitc-print-stamp-path)
     echo "Found!"
 }
 

@@ -5,7 +5,12 @@
 
 set -exu
 
-SCRIPT_TO_INSTALL="xenapi-in-rs.sh"
+THIS_DIR=$(dirname $(readlink -f $0))
+BIN_DIR="$THIS_DIR/../bin"
+SCRIPTS_DIR="$THIS_DIR/../scripts"
+export PATH=$PATH:$BIN_DIR
+
+SCRIPTS_TO_INSTALL="$SCRIPTS_DIR/*"
 INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
 XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="$1"
@@ -17,12 +22,12 @@ IMAGE_NAME="Jxici${TEST_POSTFIX}"
 function main() {
     launch_vm $TESTVM_NAME "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
-    ./wait-until-done.sh $VM_IP $PRIVKEY
+    xitc-wait-until-done $VM_IP $PRIVKEY
     prepare_for_snapshot
     delete_all_images $IMAGE_NAME
     perform_snapshot $TESTVM_NAME $IMAGE_NAME
     launch_vm $SNAPVM_NAME $IMAGE_NAME
-    ./wait-until-done.sh $VM_IP $PRIVKEY
+    xitc-wait-until-done $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
     nova image-delete $IMAGE_NAME
     nova delete $TESTVM_NAME
@@ -65,7 +70,7 @@ function launch_vm() {
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
-    VM_IP=$(./get-ip-address-of-instance.sh $vm_name)
+    VM_IP=$(xitc-get-ip-address-of-instance $vm_name)
 
     set +x
     wait_for_ssh
@@ -78,12 +83,12 @@ SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
 function start_install() {
     $SSH -i $PRIVKEY root@$VM_IP mkdir -p $(dirname "$INSTALL_TARGET")
-    $SCP -i $PRIVKEY $SCRIPT_TO_INSTALL "root@$VM_IP:$INSTALL_TARGET"
+    $SCP -i $PRIVKEY $SCRIPTS_TO_INSTALL "root@$VM_IP:$INSTALL_TARGET"
     $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" "$XENSERVER_PASSWORD" "$STAGING_VM_URL"
 }
 
 function prepare_for_snapshot() {
-    $SSH -i $PRIVKEY root@$VM_IP "rm -f $(./print-stamp-path.sh)"
+    $SSH -i $PRIVKEY root@$VM_IP "rm -f $(xitc-print-stamp-path)"
     $SSH -i $PRIVKEY root@$VM_IP "sync && sleep 5"
 }
 
