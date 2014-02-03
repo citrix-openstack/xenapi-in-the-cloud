@@ -32,6 +32,7 @@ SIZE_OF_PARTITION=$(expr $NUMBER_OF_BLOCKS \* 8)
 
 # Sleep - otherwise sfdisk complains "BLKRRPART: Device or resource busy"
 sync
+sleep 10
 
 sfdisk -d /dev/xvda | sed -e "s,[0-9]\{8\},$SIZE_OF_PARTITION,g" | sfdisk /dev/xvda
 partprobe /dev/xvda
