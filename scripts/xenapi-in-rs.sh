@@ -86,6 +86,9 @@ function main() {
             download_appliance
             create_ramdisk_contents /root/xenserver.iso
             extract_xs_installer /root/xenserver.iso /opt/xs-install
+            generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
+            configure_grub
+            update_grub
             create_resizing_initramfs_config
             update_initramfs
             set_state "SETUP_INSTALLER"
@@ -94,9 +97,6 @@ function main() {
         "SETUP_INSTALLER")
             delete_resizing_initramfs_config
             update_initramfs
-            generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
-            configure_grub
-            update_grub
             set_xenserver_installer_as_nextboot
             store_cloud_settings "$XSINST_DIRECTORY/cloud-settings"
             store_authorized_keys "$XSINST_DIRECTORY/authorized_keys"
