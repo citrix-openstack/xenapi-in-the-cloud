@@ -89,7 +89,7 @@ function main() {
             extract_xs_installer /root/xenserver.iso /opt/xs-install
             generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
             configure_grub
-            update_grub
+            update-grub
             create_resizing_initramfs_config
             update-initramfs -u
             set_state "SETUP_INSTALLER"
@@ -312,10 +312,6 @@ function configure_grub() {
     # sed -ie 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
     sed -ie 's/^.*GRUB_TERMINAL=.*$/GRUB_TERMINAL=console/g' /etc/default/grub
     sed -ie 's/GRUB_DEFAULT=0/GRUB_DEFAULT=saved/g' /etc/default/grub
-}
-
-function update_grub() {
-    update-grub
 }
 
 function set_xenserver_installer_as_nextboot() {
