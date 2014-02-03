@@ -39,6 +39,19 @@
 # 2.) Create snapshot
 # 3.) When booting instances from the snapshot, poll
 #     "$FILE_TO_TOUCH_ON_COMPLETION"
+#
+#
+# Details
+# ~~~~~~~
+# This script will install itself as a boot-time script, and will be executed
+# on each system startup. It shrinks the actual Ubuntu installation, and will
+# install a XenServer on the remaining space. This script will also be
+# installed as a startup script in XenServer. After the installation, ~henever
+# the instance is restarted, Ubuntu will boot, the networking parameters will
+# be copied to a file, and the instance will be automatically rebooted into
+# XenServer, where the networking will be adjusted, according to the saves
+# parameters. This trickery is needed, because config drive does not include
+# the networking parameters.
 
 set -eux
 
