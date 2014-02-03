@@ -84,7 +84,7 @@ function main() {
         "START")
             run_this_script_on_each_boot
             download_xenserver_files /root/xenserver.iso
-            download_appliance
+            download_appliance "$STAGING_APPLIANCE_URL"
             create_ramdisk_contents /root/xenserver.iso
             extract_xs_installer /root/xenserver.iso /opt/xs-install
             generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
@@ -191,7 +191,11 @@ function download_xenserver_files() {
 }
 
 function download_appliance() {
-    wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
+    local appliance_url
+
+    appliance_url="$1"
+
+    wget -qO /root/staging_vm.xva "$appliance_url"
 }
 
 function print_answerfile() {
