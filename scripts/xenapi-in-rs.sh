@@ -60,11 +60,11 @@ INSTALL_DIR="$(dirname $THIS_FILE)"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
-APPLIANCE_NAME="Appliance"
+APPLIANCE_NAME="$2"
 
 XENSERVER_PASSWORD="$1"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
-STAGING_APPLIANCE_URL="${2:-}"
+STAGING_APPLIANCE_URL="$3"
 FILE_TO_TOUCH_ON_COMPLETION="/var/run/xenserver.ready"
 
 DOMZERO_USER=domzero
