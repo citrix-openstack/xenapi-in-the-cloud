@@ -22,12 +22,12 @@ IMAGE_NAME="Jxici${TEST_POSTFIX}"
 function main() {
     launch_vm $TESTVM_NAME "62df001e-87ee-407c-b042-6f4e13f5d7e1"
     start_install
-    wait-until-done.sh $VM_IP $PRIVKEY
+    xitc-wait-until-done $VM_IP $PRIVKEY
     prepare_for_snapshot
     delete_all_images $IMAGE_NAME
     perform_snapshot $TESTVM_NAME $IMAGE_NAME
     launch_vm $SNAPVM_NAME $IMAGE_NAME
-    wait-until-done.sh $VM_IP $PRIVKEY
+    xitc-wait-until-done $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
     nova image-delete $IMAGE_NAME
     nova delete $TESTVM_NAME
