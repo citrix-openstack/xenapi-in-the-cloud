@@ -72,13 +72,19 @@ FILE_TO_TOUCH_ON_COMPLETION="/var/run/xenserver.ready"
 # key, the key's contents will be copied into this user's authorized_keys file
 DOMZERO_USER=domzero
 
+# Do not change this variable, as this path is hardcoded into XenServer's
+# installer. The installer will look for this directory on the device
+# specified by the boot parameter make-ramdisk, and copy the contents of this
+# directory to ramdisk.
+XSINST_DIRECTORY="/xsinst"
+
 function main() {
     case "$(get_state)" in
         "START")
             run_this_script_on_each_boot
             download_xenserver_files /root/xenserver.iso
             download_appliance
-            create_ramdisk_contents /root/xenserver.iso /xsinst
+            create_ramdisk_contents /root/xenserver.iso
             extract_xs_installer /root/xenserver.iso /opt/xs-install
             create_resizing_initramfs_config
             update_initramfs
@@ -92,8 +98,8 @@ function main() {
             configure_grub
             update_grub
             set_xenserver_installer_as_nextboot
-            store_cloud_settings /xsinst/cloud-settings
-            store_authorized_keys /xsinst/authorized_keys
+            store_cloud_settings "$XSINST_DIRECTORY/cloud-settings"
+            store_authorized_keys "$XSINST_DIRECTORY/authorized_keys"
             set_state "XENSERVER_FIRSTBOOT"
             reboot
             ;;
@@ -321,7 +327,7 @@ function create_ramdisk_contents() {
     local target_dir
 
     isofile="$1"
-    target_dir="$2"
+    target_dir="$XSINST_DIRECTORY"
 
     mkdir "$target_dir"
     ln "$isofile" "$target_dir/xenserver.iso"
