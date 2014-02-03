@@ -97,9 +97,9 @@ function main() {
         "SETUP_INSTALLER")
             delete_resizing_initramfs_config
             update_initramfs
-            set_xenserver_installer_as_nextboot
             store_cloud_settings "$XSINST_DIRECTORY/cloud-settings"
             store_authorized_keys "$XSINST_DIRECTORY/authorized_keys"
+            set_xenserver_installer_as_nextboot
             set_state "XENSERVER_FIRSTBOOT"
             reboot
             ;;
