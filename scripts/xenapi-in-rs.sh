@@ -76,6 +76,10 @@ function main() {
     case "$(get_state)" in
         "START")
             run_this_script_on_each_boot
+            download_xenserver_files /root/xenserver.iso
+            download_appliance
+            create_ramdisk_contents /root/xenserver.iso /xsinst
+            extract_xs_installer /root/xenserver.iso /opt/xs-install
             create_resizing_initramfs_config
             update_initramfs
             set_state "SETUP_INSTALLER"
@@ -84,10 +88,6 @@ function main() {
         "SETUP_INSTALLER")
             delete_resizing_initramfs_config
             update_initramfs
-            download_xenserver_files /root/xenserver.iso
-            download_appliance
-            create_ramdisk_contents /root/xenserver.iso /xsinst
-            extract_xs_installer /root/xenserver.iso /opt/xs-install
             generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
             configure_grub
             update_grub
