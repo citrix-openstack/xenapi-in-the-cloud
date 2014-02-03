@@ -67,6 +67,9 @@ XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServ
 STAGING_APPLIANCE_URL="$3"
 FILE_TO_TOUCH_ON_COMPLETION="/var/run/xenserver.ready"
 
+# It is assumed, that the appliance has a user, DOMZERO_USER, and by
+# writing the /local/domain/$DOMID/authorized_keys/$DOMZERO_USER xenstore
+# key, the key's contents will be copied into this user's authorized_keys file
 DOMZERO_USER=domzero
 
 function main() {
