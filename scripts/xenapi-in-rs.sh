@@ -39,56 +39,79 @@
 # 2.) Create snapshot
 # 3.) When booting instances from the snapshot, poll
 #     "$FILE_TO_TOUCH_ON_COMPLETION"
+#
+#
+# Details
+# ~~~~~~~
+# This script will install itself as a boot-time script, and will be executed
+# on each system startup. It shrinks the actual Ubuntu installation, and will
+# install a XenServer on the remaining space. This script will also be
+# installed as a startup script in XenServer. After the installation, ~henever
+# the instance is restarted, Ubuntu will boot, the networking parameters will
+# be copied to a file, and the instance will be automatically rebooted into
+# XenServer, where the networking will be adjusted, according to the saves
+# parameters. This trickery is needed, because config drive does not include
+# the networking parameters.
 
 set -eux
 
 THIS_FILE="$(readlink -f $0)"
+THIS_DIR="$(dirname $THIS_FILE)"
 INSTALL_DIR="$(dirname $THIS_FILE)"
 STATE_FILE="${THIS_FILE}.state"
 LOG_FILE="${THIS_FILE}.log"
 ADDITIONAL_PARAMETERS="$@"
-APPLIANCE_NAME="Appliance"
 
 XENSERVER_PASSWORD="$1"
 XENSERVER_ISO_URL="http://downloadns.citrix.com.edgesuite.net/akdlm/8159/XenServer-6.2.0-install-cd.iso"
-STAGING_APPLIANCE_URL="${2:-}"
+STAGING_APPLIANCE_URL="$2"
+APPLIANCE_NAME="$3"
 FILE_TO_TOUCH_ON_COMPLETION="/var/run/xenserver.ready"
 
+# It is assumed, that the appliance has a user, DOMZERO_USER, and by
+# writing the /local/domain/$DOMID/authorized_keys/$DOMZERO_USER xenstore
+# key, the key's contents will be copied into this user's authorized_keys file
 DOMZERO_USER=domzero
+
+# Do not change this variable, as this path is hardcoded into XenServer's
+# installer. The installer will look for this directory on the device
+# specified by the boot parameter make-ramdisk, and copy the contents of this
+# directory to ramdisk.
+XSINST_DIRECTORY="/xsinst"
 
 function main() {
     case "$(get_state)" in
         "START")
             run_this_script_on_each_boot
+            download_xenserver_files /root/xenserver.iso
+            download_appliance "$STAGING_APPLIANCE_URL"
+            create_ramdisk_contents /root/xenserver.iso
+            extract_xs_installer /root/xenserver.iso /opt/xs-install
+            generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
+            configure_grub
+            update-grub
             create_resizing_initramfs_config
-            update_initramfs
+            update-initramfs -u
             set_state "SETUP_INSTALLER"
             reboot
             ;;
         "SETUP_INSTALLER")
             delete_resizing_initramfs_config
-            update_initramfs
-            download_xenserver_files /root/xenserver.iso
-            download_appliance
-            create_ramdisk_contents /root/xenserver.iso /xsinst
-            extract_xs_installer /root/xenserver.iso /opt/xs-install
-            generate_xs_installer_grub_config /opt/xs-install file:///tmp/ramdisk/answerfile.xml
-            configure_grub
-            update_grub
+            update-initramfs -u
+            store_cloud_settings "$XSINST_DIRECTORY/cloud-settings"
+            store_authorized_keys "$XSINST_DIRECTORY/authorized_keys"
             set_xenserver_installer_as_nextboot
-            store_cloud_settings /xsinst/cloud-settings
-            store_authorized_keys /xsinst/authorized_keys
             set_state "XENSERVER_FIRSTBOOT"
             reboot
             ;;
         "XENSERVER_FIRSTBOOT")
             wait_for_xapi
             forget_networking
-            configure_appliance
+            transfer_settings_to_appliance "/root/cloud-settings"
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
-            emit_done_signal
+            create_done_file_on_appliance
             ;;
         "UBUNTU")
             mount_dom0_fs /mnt/dom0
@@ -102,10 +125,10 @@ function main() {
         "XENSERVER")
             wait_for_xapi
             forget_networking
-            configure_appliance
+            transfer_settings_to_appliance "/root/cloud-settings"
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
-            emit_done_signal
+            create_done_file_on_appliance
             ;;
     esac
 }
@@ -127,95 +150,18 @@ function get_state() {
 }
 
 function create_resizing_initramfs_config() {
-    cat > /usr/share/initramfs-tools/hooks/resize << EOF
-#!/bin/sh
-
-set -e
-
-PREREQ=""
-
-prereqs () {
-    echo "\${PREREQ}"
-}
-
-case "\${1}" in
-    prereqs)
-        prereqs
-        exit 0
-        ;;
-esac
-
-. /usr/share/initramfs-tools/hook-functions
-
-copy_exec /sbin/resize2fs
-copy_exec /sbin/e2fsck
-copy_exec /usr/bin/expr
-copy_exec /sbin/tune2fs
-copy_exec /bin/grep
-copy_exec /usr/bin/tr
-copy_exec /usr/bin/cut
-copy_exec /sbin/sfdisk
-copy_exec /sbin/partprobe
-copy_exec /bin/sed
-EOF
+    cp "$THIS_DIR/xenserver-helper-initramfs-hook.sh" \
+        /usr/share/initramfs-tools/hooks/resize
     chmod +x /usr/share/initramfs-tools/hooks/resize
 
-    cat > /usr/share/initramfs-tools/scripts/local-premount/resize << EOF
-#!/bin/sh -e
-
-PREREQ=""
-
-# Output pre-requisites
-prereqs()
-{
-        echo "\$PREREQ"
-}
-
-case "\$1" in
-    prereqs)
-        prereqs
-        exit 0
-        ;;
-esac
-
-. /scripts/functions
-
-log_begin_msg "Resize started"
-touch /etc/mtab
-
-tune2fs -O ^has_journal /dev/xvda1
-e2fsck -fp /dev/xvda1
-resize2fs /dev/xvda1 4G
-
-# Number of 4k blocks
-NUMBER_OF_BLOCKS=\$(tune2fs -l /dev/xvda1 | grep "Block count" | tr -d " " | cut -d":" -f 2)
-
-# Convert them to 512 byte sectors
-SIZE_OF_PARTITION=\$(expr \$NUMBER_OF_BLOCKS \\* 8)
-
-# Sleep - otherwise sfdisk complains "BLKRRPART: Device or resource busy"
-sleep 2
-
-sfdisk -d /dev/xvda | sed -e "s,[0-9]\{8\},\$SIZE_OF_PARTITION,g" | sfdisk /dev/xvda
-partprobe /dev/xvda
-tune2fs -j /dev/xvda1
-
-sync
-
-log_end_msg "Resize finished"
-
-EOF
+    cp "$THIS_DIR/xenserver-helper-initramfs-premount.sh" \
+        /usr/share/initramfs-tools/scripts/local-premount/resize
     chmod +x /usr/share/initramfs-tools/scripts/local-premount/resize
 }
-
 
 function delete_resizing_initramfs_config() {
     rm -f /usr/share/initramfs-tools/hooks/resize
     rm -f /usr/share/initramfs-tools/scripts/local-premount/resize
-}
-
-function update_initramfs() {
-    update-initramfs -u
 }
 
 function run_this_script_on_each_boot() {
@@ -228,10 +174,6 @@ script
     /bin/bash $THIS_FILE $ADDITIONAL_PARAMETERS >> $LOG_FILE 2>&1
 end script
 EOF
-}
-
-function create_done_file() {
-    touch "$FILE_TO_TOUCH_ON_COMPLETION"
 }
 
 function create_done_file_on_appliance() {
@@ -249,9 +191,11 @@ function download_xenserver_files() {
 }
 
 function download_appliance() {
-    if [ -n "$STAGING_APPLIANCE_URL" ]; then
-        wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
-    fi
+    local appliance_url
+
+    appliance_url="$1"
+
+    wget -qO /root/staging_vm.xva "$appliance_url"
 }
 
 function print_answerfile() {
@@ -311,7 +255,7 @@ function create_ramdisk_contents() {
     local target_dir
 
     isofile="$1"
-    target_dir="$2"
+    target_dir="$XSINST_DIRECTORY"
 
     mkdir "$target_dir"
     ln "$isofile" "$target_dir/xenserver.iso"
@@ -351,13 +295,13 @@ function generate_xs_installer_grub_config() {
     answerfile="$2"
 
     cat > /etc/grub.d/45_xs-install << EOF
-cat << XS_INSTALL
+#!/bin/sh
+exec tail -n +3 \$0
 menuentry 'XenServer installer' {
     multiboot $bootfiles/xen.gz dom0_max_vcpus=1-2 dom0_mem=max:752M com1=115200,8n1 console=com1,vga
     module $bootfiles/vmlinuz xencons=hvc console=tty0 console=hvc0 make-ramdisk=/dev/sda1 answerfile=$answerfile install
     module $bootfiles/install.img
 }
-XS_INSTALL
 EOF
     chmod +x /etc/grub.d/45_xs-install
 }
@@ -368,10 +312,6 @@ function configure_grub() {
     # sed -ie 's/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
     sed -ie 's/^.*GRUB_TERMINAL=.*$/GRUB_TERMINAL=console/g' /etc/default/grub
     sed -ie 's/GRUB_DEFAULT=0/GRUB_DEFAULT=saved/g' /etc/default/grub
-}
-
-function update_grub() {
-    update-grub
 }
 
 function set_xenserver_installer_as_nextboot() {
@@ -419,21 +359,6 @@ function forget_networking() {
         xe pif-forget uuid=$pif
     done
     unset IFS
-}
-
-function configure_dom0_to_cloud() {
-    . /root/cloud-settings
-
-    xe pif-introduce \
-        device=eth0 host-uuid=$(xe host-list --minimal) mac=$MACADDRESS
-    xe pif-reconfigure-ip \
-        uuid=$(xe pif-list device=eth0 --minimal) \
-        mode=static \
-        IP=$ADDRESS \
-        netmask=$NETMASK \
-        gateway=$GATEWAY \
-        DNS=$NAMESERVERS
-    xe host-management-reconfigure pif-uuid=$(xe pif-list device=eth0 --minimal)
 }
 
 function add_boot_config_for_ubuntu() {
@@ -513,8 +438,12 @@ function run_on_appliance() {
         "$DOMZERO_USER@$vm_ip" "$@"
 }
 
-function configure_appliance_to_cloud() {
-    . /root/cloud-settings
+function configure_networking() {
+    local network_settings
+
+    network_settings="$1"
+
+    . "$network_settings"
 
     xe pif-introduce \
         device=eth0 host-uuid=$(xe host-list --minimal) mac=$MACADDRESS
@@ -629,21 +558,13 @@ EOF
     cat $tmpdomzerokey >> /root/.ssh/authorized_keys
 }
 
-function configure_appliance() {
-    if [ -z "$STAGING_APPLIANCE_URL" ]; then
-        configure_dom0_to_cloud
-    else
-        configure_appliance_to_cloud
-    fi
-    /opt/xensource/libexec/interface-reconfigure rewrite
-}
+function transfer_settings_to_appliance() {
+    local network_settings
 
-function emit_done_signal() {
-    if [ -z "$STAGING_APPLIANCE_URL" ]; then
-        create_done_file
-    else
-        create_done_file_on_appliance
-    fi
+    network_settings="$1"
+
+    configure_networking "$network_settings"
+    /opt/xensource/libexec/interface-reconfigure rewrite
 }
 
 main

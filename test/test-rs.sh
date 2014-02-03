@@ -11,7 +11,7 @@ SCRIPTS_DIR="$THIS_DIR/../scripts"
 export PATH=$PATH:$BIN_DIR
 
 SCRIPTS_TO_INSTALL="$SCRIPTS_DIR/*"
-INSTALL_TARGET="/opt/nodepool-scripts/xenserver_cloud.sh"
+INSTALL_TARGET="/opt/nodepool-scripts/"
 XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="$1"
 TEST_POSTFIX="$2"
@@ -82,9 +82,9 @@ SCP="scp $COMMON_SSH_OPTIONS"
 SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
 
 function start_install() {
-    $SSH -i $PRIVKEY root@$VM_IP mkdir -p $(dirname "$INSTALL_TARGET")
+    $SSH -i $PRIVKEY root@$VM_IP mkdir -p "$INSTALL_TARGET"
     $SCP -i $PRIVKEY $SCRIPTS_TO_INSTALL "root@$VM_IP:$INSTALL_TARGET"
-    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET" "$XENSERVER_PASSWORD" "$STAGING_VM_URL"
+    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET/xenapi-in-rs.sh" "$XENSERVER_PASSWORD" "$STAGING_VM_URL" "Devstack"
 }
 
 function prepare_for_snapshot() {
