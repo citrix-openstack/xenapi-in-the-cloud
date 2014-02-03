@@ -106,7 +106,7 @@ function main() {
         "XENSERVER_FIRSTBOOT")
             wait_for_xapi
             forget_networking
-            configure_appliance
+            configure_appliance_network "/root/cloud-settings"
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
@@ -124,7 +124,7 @@ function main() {
         "XENSERVER")
             wait_for_xapi
             forget_networking
-            configure_appliance
+            configure_appliance_network "/root/cloud-settings"
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
             create_done_file_on_appliance
@@ -515,7 +515,11 @@ function run_on_appliance() {
 }
 
 function configure_appliance_to_cloud() {
-    . /root/cloud-settings
+    local network_settings
+
+    network_settings="$1"
+
+    . "$network_settings"
 
     xe pif-introduce \
         device=eth0 host-uuid=$(xe host-list --minimal) mac=$MACADDRESS
@@ -630,8 +634,12 @@ EOF
     cat $tmpdomzerokey >> /root/.ssh/authorized_keys
 }
 
-function configure_appliance() {
-    configure_appliance_to_cloud
+function configure_appliance_network() {
+    local network_settings
+
+    network_settings="$1"
+
+    configure_appliance_to_cloud "$settings"
     /opt/xensource/libexec/interface-reconfigure rewrite
 }
 
