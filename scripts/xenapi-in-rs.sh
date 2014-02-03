@@ -106,7 +106,7 @@ function main() {
         "XENSERVER_FIRSTBOOT")
             wait_for_xapi
             forget_networking
-            configure_appliance_network "/root/cloud-settings"
+            transfer_settings_to_appliance "/root/cloud-settings"
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
@@ -124,7 +124,7 @@ function main() {
         "XENSERVER")
             wait_for_xapi
             forget_networking
-            configure_appliance_network "/root/cloud-settings"
+            transfer_settings_to_appliance "/root/cloud-settings"
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
             create_done_file_on_appliance
@@ -634,7 +634,7 @@ EOF
     cat $tmpdomzerokey >> /root/.ssh/authorized_keys
 }
 
-function configure_appliance_network() {
+function transfer_settings_to_appliance() {
     local network_settings
 
     network_settings="$1"
