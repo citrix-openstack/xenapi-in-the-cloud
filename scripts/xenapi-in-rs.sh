@@ -101,7 +101,7 @@ function main() {
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
-            emit_done_signal
+            create_done_file_on_appliance
             ;;
         "UBUNTU")
             mount_dom0_fs /mnt/dom0
@@ -118,7 +118,7 @@ function main() {
             configure_appliance
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
-            emit_done_signal
+            create_done_file_on_appliance
             ;;
     esac
 }
@@ -243,10 +243,6 @@ end script
 EOF
 }
 
-function create_done_file() {
-    touch "$FILE_TO_TOUCH_ON_COMPLETION"
-}
-
 function create_done_file_on_appliance() {
     while ! echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance; do
         sleep 1
@@ -262,9 +258,7 @@ function download_xenserver_files() {
 }
 
 function download_appliance() {
-    if [ -n "$STAGING_APPLIANCE_URL" ]; then
-        wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
-    fi
+    wget -qO /root/staging_vm.xva "$STAGING_APPLIANCE_URL"
 }
 
 function print_answerfile() {
@@ -432,21 +426,6 @@ function forget_networking() {
         xe pif-forget uuid=$pif
     done
     unset IFS
-}
-
-function configure_dom0_to_cloud() {
-    . /root/cloud-settings
-
-    xe pif-introduce \
-        device=eth0 host-uuid=$(xe host-list --minimal) mac=$MACADDRESS
-    xe pif-reconfigure-ip \
-        uuid=$(xe pif-list device=eth0 --minimal) \
-        mode=static \
-        IP=$ADDRESS \
-        netmask=$NETMASK \
-        gateway=$GATEWAY \
-        DNS=$NAMESERVERS
-    xe host-management-reconfigure pif-uuid=$(xe pif-list device=eth0 --minimal)
 }
 
 function add_boot_config_for_ubuntu() {
@@ -643,20 +622,8 @@ EOF
 }
 
 function configure_appliance() {
-    if [ -z "$STAGING_APPLIANCE_URL" ]; then
-        configure_dom0_to_cloud
-    else
-        configure_appliance_to_cloud
-    fi
+    configure_appliance_to_cloud
     /opt/xensource/libexec/interface-reconfigure rewrite
-}
-
-function emit_done_signal() {
-    if [ -z "$STAGING_APPLIANCE_URL" ]; then
-        create_done_file
-    else
-        create_done_file_on_appliance
-    fi
 }
 
 main
