@@ -70,7 +70,7 @@ function launch_vm() {
 	--flavor "performance1-8" \
 	"$vm_name" --key-name "$privkey_name"
 
-    VM_IP=$(get-ip-address-of-instance.sh $vm_name)
+    VM_IP=$(xitc-get-ip-address-of-instance $vm_name)
 
     set +x
     wait_for_ssh
