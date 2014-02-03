@@ -91,13 +91,13 @@ function main() {
             configure_grub
             update_grub
             create_resizing_initramfs_config
-            update_initramfs
+            update-initramfs -u
             set_state "SETUP_INSTALLER"
             reboot
             ;;
         "SETUP_INSTALLER")
             delete_resizing_initramfs_config
-            update_initramfs
+            update-initramfs -u
             store_cloud_settings "$XSINST_DIRECTORY/cloud-settings"
             store_authorized_keys "$XSINST_DIRECTORY/authorized_keys"
             set_xenserver_installer_as_nextboot
@@ -162,10 +162,6 @@ function create_resizing_initramfs_config() {
 function delete_resizing_initramfs_config() {
     rm -f /usr/share/initramfs-tools/hooks/resize
     rm -f /usr/share/initramfs-tools/scripts/local-premount/resize
-}
-
-function update_initramfs() {
-    update-initramfs -u
 }
 
 function run_this_script_on_each_boot() {
