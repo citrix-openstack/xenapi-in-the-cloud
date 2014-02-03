@@ -88,7 +88,7 @@ function start_install() {
 }
 
 function prepare_for_snapshot() {
-    $SSH -i $PRIVKEY root@$VM_IP "rm -f $(print-stamp-path.sh)"
+    $SSH -i $PRIVKEY root@$VM_IP "rm -f $(xitc-print-stamp-path)"
     $SSH -i $PRIVKEY root@$VM_IP "sync && sleep 5"
 }
 
