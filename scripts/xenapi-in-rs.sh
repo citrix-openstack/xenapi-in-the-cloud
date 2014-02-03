@@ -514,7 +514,7 @@ function run_on_appliance() {
         "$DOMZERO_USER@$vm_ip" "$@"
 }
 
-function configure_appliance_to_cloud() {
+function set_appliance_network_config() {
     local network_settings
 
     network_settings="$1"
@@ -639,7 +639,7 @@ function transfer_settings_to_appliance() {
 
     network_settings="$1"
 
-    configure_appliance_to_cloud "$settings"
+    set_appliance_network_config "$network_settings"
     /opt/xensource/libexec/interface-reconfigure rewrite
 }
 
