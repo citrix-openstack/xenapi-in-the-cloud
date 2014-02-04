@@ -519,7 +519,7 @@ function configure_networking() {
         echo "" | run_on_appliance crontab -
 
         # Create an ssh key for domzero user
-        echo 'ssh-keygen -f /home/domzero/.ssh/id_rsa -C domzero@appliance -N "" -q' | run_on_appliance
+        echo "ssh-keygen -f /home/$DOMZERO_USER/.ssh/id_rsa -C $DOMZERO_USER@appliance -N \"\" -q" | run_on_appliance
     fi
 
     # Update network configuration
@@ -548,7 +548,7 @@ EOF
     tmpdomzerokey=$(mktemp)
 
     # Enable domzero user to log in to dom0
-    run_on_appliance cat /home/domzero/.ssh/id_rsa.pub > $tmpdomzerokey
+    run_on_appliance cat /home/$DOMZERO_USER/.ssh/id_rsa.pub > $tmpdomzerokey
 
     # Update ssh keys and reboot, so settings applied
     {
