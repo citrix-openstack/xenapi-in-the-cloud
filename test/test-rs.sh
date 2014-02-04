@@ -84,7 +84,7 @@ SSH="ssh -o BatchMode=yes $COMMON_SSH_OPTIONS"
 function start_install() {
     $SSH -i $PRIVKEY root@$VM_IP mkdir -p "$INSTALL_TARGET"
     $SCP -i $PRIVKEY $SCRIPTS_TO_INSTALL "root@$VM_IP:$INSTALL_TARGET"
-    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET/xenapi-in-rs.sh" "$XENSERVER_PASSWORD" "$STAGING_VM_URL" "Devstack"
+    $SSH -i $PRIVKEY root@$VM_IP bash "$INSTALL_TARGET/convert_node_to_xenserver.sh" "$XENSERVER_PASSWORD" "$STAGING_VM_URL" "Devstack"
 }
 
 function prepare_for_snapshot() {
