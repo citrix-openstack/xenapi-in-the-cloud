@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+set -ex
+
 PREREQ=""
 
 # Output pre-requisites
@@ -30,12 +32,12 @@ NUMBER_OF_BLOCKS=$(tune2fs -l /dev/xvda1 | grep "Block count" | tr -d " " | cut 
 # Convert them to 512 byte sectors
 SIZE_OF_PARTITION=$(expr $NUMBER_OF_BLOCKS \* 8)
 
-# Sleep - otherwise sfdisk complains "BLKRRPART: Device or resource busy"
-sync
-sleep 10
+sfdisk -d /dev/xvda | sed -e "s,[0-9]\{8\},$SIZE_OF_PARTITION,g" | sfdisk /dev/xvda || true
 
-sfdisk -d /dev/xvda | sed -e "s,[0-9]\{8\},$SIZE_OF_PARTITION,g" | sfdisk /dev/xvda
-partprobe /dev/xvda
+while ! partprobe /dev/xvda; do
+    sleep 1
+done
+
 tune2fs -j /dev/xvda1
 
 sync
