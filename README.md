@@ -37,17 +37,17 @@ Make a directory to hold the scripts:
         $SSH_PARAMS \
         root@$IP mkdir -p /opt/xenapi-in-the-cloud
 
-Copy the `xenapi-in-rs.sh` script to that directory:
+Copy the `convert_node_to_xenserver.sh` script to that directory:
 
     scp \
         $SSH_PARAMS \
-        xenapi-in-rs.sh root@$IP:/opt/xenapi-in-the-cloud/
+        convert_node_to_xenserver.sh root@$IP:/opt/xenapi-in-the-cloud/
 
 And execute that script with the following parameters:
 
     ssh \
         $SSH_PARAMS \
-        root@$IP bash /opt/xenapi-in-the-cloud/xenapi-in-rs.sh XENSERVER_PASSWORD [APPLIANCE_URL]
+        root@$IP bash /opt/xenapi-in-the-cloud/convert_node_to_xenserver.sh XENSERVER_PASSWORD [APPLIANCE_URL]
 
 Where:
  - `XENSERVER_PASSWORD` is a mandatory parameter, this will be the password
@@ -85,5 +85,5 @@ setup script works, and the instance could be used in a cloud environment.
 ## How Does it Work?
 
 The idea is to have a single script (to make it easy to deploy), that is able
-to convert an instance to a XenServer. Look at the [xenapi-in-rs.sh](xenapi-in-rs.sh)
+to convert an instance to a XenServer. Look at the [convert_node_to_xenserver.sh](convert_node_to_xenserver.sh)
 file, the main function implements the state machine.
