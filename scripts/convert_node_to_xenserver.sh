@@ -21,14 +21,12 @@
 # ~~~~~~~~~~~~
 # 1.) Start an Ubuntu HVM instance in the Rackspace cloud
 # 2.) Copy this scipt to the instance's filesystem
-# 3.) Execute this script on the instance:
+# 3.) Execute this script on the instance with 3 parameters:
 #   - First parameter is the password for the XenServer
-#   - Second optional parameter is an appliance to install:
-#     - Without second parameter dom0 will be accessible through the public IP
-#     - With appliance URL given, that appliance will be accessible through
-#       the public IP. (Note, that the appliance has to be able to
-#       interact with xen). The XVA is generated using:
-#       https://github.com/citrix-openstack/openstack-xenapi-testing-xva
+#   - Second parameter is a URL to an xva appliance to be installed. For
+#     building such an appliance, see:
+#        https://github.com/citrix-openstack/openstack-xenapi-testing-xva
+#   - Third parameter should be the name-label for the appliance.
 # 4.) Poll the public IP through ssh, and Wait until the file
 #     "$FILE_TO_TOUCH_ON_COMPLETION" exists
 #
@@ -43,15 +41,22 @@
 #
 # Details
 # ~~~~~~~
+# WARINING: This script is a workaround, and should only be used for test
+# purposes.
+#
 # This script will install itself as a boot-time script, and will be executed
 # on each system startup. It shrinks the actual Ubuntu installation, and will
 # install a XenServer on the remaining space. This script will also be
-# installed as a startup script in XenServer. After the installation, ~henever
+# installed as a startup script in XenServer. After the installation, whenever
 # the instance is restarted, Ubuntu will boot, the networking parameters will
 # be copied to a file, and the instance will be automatically rebooted into
-# XenServer, where the networking will be adjusted, according to the saves
+# XenServer, where the networking will be adjusted, according to the saved
 # parameters. This trickery is needed, because config drive does not include
 # the networking parameters.
+#
+# The appliance will be accessible through the public IP of the instance,
+# and dom0 could be accessed from the instance, on the IP address:
+#    192.168.33.2
 
 set -eux
 
