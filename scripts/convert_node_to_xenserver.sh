@@ -57,6 +57,10 @@
 # The appliance will be accessible through the public IP of the instance,
 # and dom0 could be accessed from the instance, on the IP address:
 #    192.168.33.2
+#
+# Logging
+# ~~~~~~~
+# All the output of this script is logged to $0.log
 
 set -eux
 
