@@ -15,9 +15,9 @@ INSTALL_TARGET="/opt/nodepool-scripts/"
 XENSERVER_PASSWORD=xspassword
 STAGING_VM_URL="$1"
 TEST_POSTFIX="$2"
-TESTVM_NAME="Jxict${TEST_POSTFIX}"
-SNAPVM_NAME="Jxics${TEST_POSTFIX}"
-IMAGE_NAME="Jxici${TEST_POSTFIX}"
+TESTVM_NAME="Jxitct${TEST_POSTFIX}"
+SNAPVM_NAME="Jxitcs${TEST_POSTFIX}"
+IMAGE_NAME="Jxitci${TEST_POSTFIX}"
 
 function main() {
     launch_vm $TESTVM_NAME "62df001e-87ee-407c-b042-6f4e13f5d7e1"
@@ -51,7 +51,7 @@ function launch_vm() {
     image_name="$2"
 
     PRIVKEY="$vm_name.pem"
-    privkey_name="tempkey-$vm_name"
+    privkey_name="$vm_name"
 
     rm -f "$PRIVKEY" || true
     nova keypair-delete "$privkey_name" || true
