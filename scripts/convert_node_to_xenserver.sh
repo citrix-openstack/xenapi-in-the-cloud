@@ -19,8 +19,8 @@
 
 # Installation
 # ~~~~~~~~~~~~
-# 1.) Start an Ubuntu HVM instance in the Rackspace cloud
-# 2.) Copy this scipt to the instance's filesystem
+# 1.) Start an Ubuntu HVM instance in the Rackspace cloud.
+# 2.) Copy the files from this directory to the instance.
 # 3.) Execute this script on the instance with 3 parameters:
 #   - First parameter is the password for the XenServer
 #   - Second parameter is a URL to an xva appliance to be installed. For
