@@ -22,7 +22,9 @@ Like this:
         --flavor "performance1-8" \
         --key-name matekey instance
 
-After it's done, get the IP address of your instance:
+After it's done, get the IP address of your instance. Some convenience scripts
+can be found in the `bin` directory to do this, so set your `PATH` to include
+the bin directory.
 
     IP=$(xitc-get-ip-address-of-instance instance)
 
@@ -37,37 +39,34 @@ Make a directory to hold the scripts:
         $SSH_PARAMS \
         root@$IP mkdir -p /opt/xenapi-in-the-cloud
 
-Copy the `convert_node_to_xenserver.sh` script to that directory:
+Copy the files from the `scripts/` directory to that directory:
 
     scp \
         $SSH_PARAMS \
-        convert_node_to_xenserver.sh root@$IP:/opt/xenapi-in-the-cloud/
+        scripts/* root@$IP:/opt/xenapi-in-the-cloud/
 
 And execute that script with the following parameters:
 
     ssh \
         $SSH_PARAMS \
-        root@$IP bash /opt/xenapi-in-the-cloud/convert_node_to_xenserver.sh XENSERVER_PASSWORD [APPLIANCE_URL]
+        root@$IP bash /opt/xenapi-in-the-cloud/convert_node_to_xenserver.sh \
+            $XENSERVER_PASSWORD $APPLIANCE_URL $APPLIANCE_NAME_LABEL
 
 Where:
- - `XENSERVER_PASSWORD` is a mandatory parameter, this will be the password
- of your XenServer.
- - `APPLIANCE_URL` is an optional parameter. It should be an url, specifying
- an XVA file, that will be configured to listen on the public IP. The appliance
- could be created with the help of [these scripts](
- https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
+ - `XENSERVER_PASSWORD` will be your XenServer's password.
+ - `APPLIANCE_URL` is an url, specifying an XVA file, that will be configured
+   to listen on the public IP. The appliance could be created with the help of
+   [these scripts](https://github.com/citrix-openstack/openstack-xenapi-testing-xva)
+ - `APPLIANCE_NAME_LABEL` is the name-label to be given to the appliance.
 
 Now, you have to monitor the public IP with ssh, and look for a stamp file. To
 get the name of the stamp file, execute `xitc-print-stamp-path`. Whenever you
-successfully logged in, and the file exists, the transformation finished:
+successfully logged in, and the file exists, the transformation finished. A
+helper script is provided, that will block until the stamp file has been found:
 
     xitc-wait-until-done $IP matekey.priv
 
-If you specified `APPLIANCE_URL`, that VM will be listening on the public IP
-address, the XenServer will be accessible on the IP address: `192.168.33.2`.
-
-If no appliance was given, you will be able to access dom0 through the public
-IP.
+XenServer will be accessible on the IP address: `192.168.33.2`.
 
 ## Testing
 
@@ -84,6 +83,6 @@ setup script works, and the instance could be used in a cloud environment.
 
 ## How Does it Work?
 
-The idea is to have a single script (to make it easy to deploy), that is able
-to convert an instance to a XenServer. Look at the [convert_node_to_xenserver.sh](convert_node_to_xenserver.sh)
-file, the main function implements the state machine.
+Look at the [convert_node_to_xenserver.sh](convert_node_to_xenserver.sh) file,
+the main function implements a state machine, that's executed by both Ubuntu
+and XenServer's dom0.
