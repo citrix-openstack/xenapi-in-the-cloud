@@ -445,7 +445,7 @@ function run_on_appliance() {
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
         -o BatchMode=yes \
-        "$DOMZERO_USER@$vm_ip" "$@"
+        "$DOMZERO_USER@$vm_ip" bash -e -u -s -x -- "$@"
 }
 
 function configure_networking() {
