@@ -186,7 +186,7 @@ EOF
 }
 
 function create_done_file_on_appliance() {
-    while ! echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | run_on_appliance; do
+    while ! echo "sudo touch $FILE_TO_TOUCH_ON_COMPLETION" | bash_on_appliance; do
         sleep 1
     done
 }
@@ -425,7 +425,7 @@ function wait_for_networking() {
     done
 }
 
-function run_on_appliance() {
+function bash_on_appliance() {
     local vm_ip
     local vm
 
@@ -520,21 +520,22 @@ function configure_networking() {
         xenstore-write /local/domain/$DOMID/authorized_keys/$DOMZERO_USER "$(cat /root/dom0key.pub)"
         xenstore-chmod -u /local/domain/$DOMID/authorized_keys/$DOMZERO_USER r$DOMID
 
-        while ! run_on_appliance true < /dev/null > /dev/null 2>&1; do
+        while ! echo "true" | bash_on_appliance; do
             echo "waiting for key to be activated"
             sleep 1
         done
 
         # Remove authorized_keys updater
-        echo "" | run_on_appliance crontab -
+        echo "echo \"\" | crontab -" | bash_on_appliance
 
         # Create an ssh key for domzero user
-        echo "ssh-keygen -f /home/$DOMZERO_USER/.ssh/id_rsa -C $DOMZERO_USER@appliance -N \"\" -q" | run_on_appliance
+        echo "ssh-keygen -f /home/$DOMZERO_USER/.ssh/id_rsa -C $DOMZERO_USER@appliance -N \"\" -q" | bash_on_appliance
     fi
 
     # Update network configuration
     {
     cat << EOF
+sudo tee /etc/network/interfaces
 auto lo
 iface lo inet loopback
 
@@ -553,17 +554,20 @@ auto eth2
   address 192.168.33.1
   netmask 255.255.255.0
 EOF
-    } | run_on_appliance "sudo tee /etc/network/interfaces"
+    } | bash_on_appliance
 
     tmpdomzerokey=$(mktemp)
 
     # Enable domzero user to log in to dom0
-    run_on_appliance cat /home/$DOMZERO_USER/.ssh/id_rsa.pub > $tmpdomzerokey
+    echo "cat /home/$DOMZERO_USER/.ssh/id_rsa.pub" | bash_on_appliance > $tmpdomzerokey
 
     # Update ssh keys and reboot, so settings applied
     {
+        echo "sudo tee /root/.ssh/authorized_keys"
         cat /root/.ssh/authorized_keys
-    } | run_on_appliance "sudo tee /root/.ssh/authorized_keys && sudo reboot"
+    } | bash_on_appliance
+
+    echo "sudo reboot" | bash_on_appliance
 
     cat $tmpdomzerokey >> /root/.ssh/authorized_keys
 }
