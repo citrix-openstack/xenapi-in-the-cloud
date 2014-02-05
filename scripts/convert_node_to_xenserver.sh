@@ -436,6 +436,7 @@ function run_on_appliance() {
     done
 
     ssh \
+        -q \
         -i /root/dom0key \
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
