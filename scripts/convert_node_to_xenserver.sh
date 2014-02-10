@@ -120,6 +120,7 @@ function main() {
             add_boot_config_for_ubuntu /mnt/ubuntu/boot /boot/
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
+            sync
             create_done_file_on_appliance
             ;;
         "UBUNTU")
@@ -137,6 +138,7 @@ function main() {
             transfer_settings_to_appliance "/root/cloud-settings"
             start_ubuntu_on_next_boot /boot/
             set_state "UBUNTU"
+            sync
             create_done_file_on_appliance
             ;;
     esac
