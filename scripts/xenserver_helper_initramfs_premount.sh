@@ -33,7 +33,10 @@ NUMBER_OF_BLOCKS=$(tune2fs -l /dev/xvda1 | grep "Block count" | tr -d " " | cut 
 SIZE_OF_PARTITION=$(expr $NUMBER_OF_BLOCKS \* 8)
 
 sfdisk -d /dev/xvda | sed -e "s,[0-9]\{8\},$SIZE_OF_PARTITION,g" > /tmp/new_layout
-cat /tmp/new_layout | sfdisk /dev/xvda
+
+while !  cat /tmp/new_layout | sfdisk /dev/xvda; do
+    sleep 1
+done
 
 while ! partprobe /dev/xvda; do
     sleep 1
