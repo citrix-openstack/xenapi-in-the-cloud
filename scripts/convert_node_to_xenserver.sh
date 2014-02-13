@@ -91,6 +91,7 @@ XSINST_DIRECTORY="/xsinst"
 function main() {
     case "$(get_state)" in
         "START")
+            dump_disk_config
             run_this_script_on_each_boot
             download_xenserver_files /root/xenserver.iso
             download_appliance "$STAGING_APPLIANCE_URL"
@@ -105,6 +106,7 @@ function main() {
             reboot
             ;;
         "SETUP_INSTALLER")
+            dump_disk_config
             delete_resizing_initramfs_config
             update-initramfs -u
             store_cloud_settings "$XSINST_DIRECTORY/cloud-settings"
@@ -581,6 +583,11 @@ function transfer_settings_to_appliance() {
 
     configure_networking "$network_settings"
     /opt/xensource/libexec/interface-reconfigure rewrite
+}
+
+function dump_disk_config() {
+    echo "DUMPING Primary disk's configuration"
+    sfdisk -d /dev/xvda
 }
 
 main
