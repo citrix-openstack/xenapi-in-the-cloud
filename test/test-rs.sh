@@ -29,9 +29,6 @@ function main() {
     launch_vm $SNAPVM_NAME $IMAGE_NAME
     xitc-wait-until-done $VM_IP $PRIVKEY
     test_ssh_access_to_dom0
-    nova image-delete $IMAGE_NAME
-    nova delete $TESTVM_NAME
-    nova delete $SNAPVM_NAME
 
     echo "ALL TESTS PASSED"
 }
