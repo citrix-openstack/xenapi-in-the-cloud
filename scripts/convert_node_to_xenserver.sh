@@ -312,7 +312,7 @@ function generate_xs_installer_grub_config() {
 exec tail -n +3 \$0
 menuentry 'XenServer installer' {
     multiboot $bootfiles/xen.gz dom0_max_vcpus=1-2 dom0_mem=max:752M com1=115200,8n1 console=com1,vga
-    module $bootfiles/vmlinuz xencons=hvc console=tty0 console=hvc0 make-ramdisk=/dev/sda1 answerfile=$answerfile install
+    module $bootfiles/vmlinuz xencons=hvc console=tty0 make-ramdisk=/dev/sda1 answerfile=$answerfile install
     module $bootfiles/install.img
 }
 EOF
