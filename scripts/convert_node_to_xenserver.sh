@@ -405,8 +405,7 @@ function start_ubuntu_on_next_boot() {
 
     sed -ie 's,default xe-serial,default ubuntu,g' $bootfiles/extlinux.conf
 
-    echo "ACTUAL STATE OF EXTLINUX IS"
-    cat $bootfiles/extlinux.conf
+    log_extlinux $bootfiles/extlinux.conf
 }
 
 function start_xenserver_on_next_boot() {
@@ -416,8 +415,16 @@ function start_xenserver_on_next_boot() {
 
     sed -ie 's,default ubuntu,default xe-serial,g' $bootfiles/extlinux.conf
 
+    log_extlinux $bootfiles/extlinux.conf
+}
+
+function log_extlinux() {
+    local extlinux_conf
+
+    extlinux_conf="$1"
+
     echo "ACTUAL STATE OF EXTLINUX IS"
-    cat $bootfiles/extlinux.conf
+    cat $extlinux_conf
 }
 
 function mount_dom0_fs() {
