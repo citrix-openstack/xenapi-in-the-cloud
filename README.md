@@ -4,6 +4,17 @@
 
 Tools to run a XenAPI managed hypervisor in the cloud
 
+## Update scripts from the OpenStack repository
+
+This repository is an incubator to create the scripts, which are living inside
+OpenStack's official config repository. If you want to use the official files,
+you'll need to copy those files to `scripts/` directory, or alternatively run:
+
+    ./refresh_scripts_from_openstack.sh
+
+It will search and grab the files from openstack-infra/config to your local
+`scripts` directory.
+
 ## Start XenServer in the Rackspace cloud
 
 To launch a XenServer in the Rackspace cloud, launch an instance with the
