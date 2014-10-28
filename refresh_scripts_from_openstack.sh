@@ -3,8 +3,8 @@
 set -eu
 
 TMPDIR=$(mktemp -d)
-CONFIG="$TMPDIR/config"
-REPO="https://github.com/openstack-infra/config"
+CONFIG="$TMPDIR/project-config"
+REPO="https://github.com/openstack-infra/project-config"
 
 THIS_FILE=$(readlink -f $0)
 THIS_DIR=$(dirname $THIS_FILE)
